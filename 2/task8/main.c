@@ -14,7 +14,7 @@ double f(double x, double epsilon) {
 		
 		double currentElementDenominator = (2 * n) + 1;
 		
-		// if we raise -1 to the the even power, it will be 1
+		/* if we raise -1 to the the even power, it will be 1, in any other case it will not change itself */
 		double currentElementNumerator = ((n % 2 == 0) ? 1 : -1) * pow(x, currentElementDenominator);
 		
 		currentElement = currentElementNumerator / currentElementDenominator;
@@ -53,9 +53,9 @@ int main(int argc, char *argv[]) {
 	
 	double regularResult = f(x, epsilon);
 	
-	prinf("f(x) = %lf\n", regularResult);
+	printf("f(x) = %lf\n", regularResult);
 
-	prinf("Arctg(x) = %lf\n", atan(x));
+	printf("Arctg(x) = %lf\n", atan(x));
 	
 	system("pause");
 	
