@@ -22,7 +22,7 @@ int z_findMinPowerGreaterThan(int base, int threshold, int startPower, int enthr
 /*	int leftBorder; */
 /*	int rightBorder; */
 
-	int toRight = 1;
+	short int toRight = 1;
 	
 	int iterations = 0; /* debug line */
 	
@@ -30,63 +30,63 @@ int z_findMinPowerGreaterThan(int base, int threshold, int startPower, int enthr
 		
 		if (toRight) {
 			
-			/* TODO try using do while cause */
-			while (intPow(base, power) <= threshold) {
+			int powResult = intPow(base, power);
 			
-				/* leftBorder = power; */
+			int previousPowResult;
+			
+			while (powResult <= threshold) {
+				
+				iterations++;
+				
+				previousPowResult = powResult;
+				
+				powResult *= intPow(base, enthropy);
+				
+				if (powResult < previousPowResult) {
+					
+					/* integer overflow */
+					
+					goto mark;
+					
+				}
 				
 				power += enthropy;
 				
-				iterations++; /* debug line */
-				
 			}
-			
-			/* if (z_powerOk(base, power, threshold)) {*/
-				
-				/* we've found the right power */
-				/* break 2; in php, break topMark; in js, java and ts */
-				/* goto topMark; */
-				
-			/*}*/
-			
-			toRight = 0;
 			
 		}
 		else {
 			
-			while (intPow(base, power - 1) > threshold) {
+			int powResult = intPow(base, power - 1);
+			
+			while (powResult > threshold) {
+				
+				powResult /= intPow(base, enthropy);
 				
 				power -= enthropy;
 				
-				iterations++; /* debug line */
+				iterations++;
 				
 			}
 			
-			/* if (z_powerOk(base, power, threshold)) {*/
-				
-				/* we've found the right power */
-				/* break 2; in php, break topMark; in js, java and ts */
-				/* goto topMark; */
-				
-			/*}*/
-			
-			toRight = 1;
 			
 		}
+		
+		toRight = !toRight;
 		
 		enthropy /= 2;
 		
 	}
 	
-	topMark:
+	mark:
 		
-	printf("=======================\nIterations: %d\n=======================\n", iterations);
+	printf("=======================\nIterations: %d\n", iterations);
 	
 	return power;
 	
 }
 
-int main(int argc, char *argv[]) {
+int main() {
 	
 	int k;
 	
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 		
 		int minPower = z_findMinPowerGreaterThan(x, k, 0, enthropy);
 		
-		printf("For x = %d, minimum power is %d, because %d ^ %d = %d > %d, %d ^ %d = %d <= %d\n\n", x, minPower, x, minPower, intPow(x, minPower), k, x, minPower - 1, intPow(x, minPower - 1), k);
+		printf("For x = %d, min power is %d, because %d ^ %d = %d > %d, %d ^ %d = %d <= %d\n", x, minPower, x, minPower, intPow(x, minPower), k, x, minPower - 1, intPow(x, minPower - 1), k);
 		
 	}
 	
