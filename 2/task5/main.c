@@ -13,9 +13,8 @@ int isPowerOf(int x, int power) {
         
         int powerDigit = x % power; /* the digit in the base of power */
         
-        printf("power digit: %d\n", powerDigit);
+        /* printf("power digit: %d\n", powerDigit); */
           
-        /* if (x < power || x % power != 0) { */
         if (powerDigit != 0 && (powerDigit != 1 || x == power)) {
             
             isPower = 0;
@@ -32,7 +31,7 @@ int isPowerOf(int x, int power) {
     
 }
 
-int main(int argc, char *argv[]) {
+int main() {
     
     int n;
     
@@ -41,8 +40,6 @@ int main(int argc, char *argv[]) {
     scanf("%d", &n);
     
     printf("n = %d\n", n);
-    
-    /* printf("res = %d\n", isPowerOf(n, 5)); */
     
     if (isPowerOf(n, 5)) printf("%d is power of 5", n);
     else printf("%d is not power of 5", n);
