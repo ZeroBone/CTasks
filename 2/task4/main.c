@@ -14,7 +14,7 @@ double f(int n, double x) {
         
         double currentExpression = sinx;
         
-        int flag = 1; /* 1 means cos, 0 means sin */
+        short int flag = 1; /* 1 means cos, 0 means sin */
         
         int j;
         
@@ -34,7 +34,7 @@ double f(int n, double x) {
            
 }
 
-int main(int argc, char *argv[]) {
+int main() {
     
     int n;
     double x;
