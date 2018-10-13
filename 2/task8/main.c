@@ -14,8 +14,11 @@ double f(double x, double epsilon) {
 		
 		double currentElementDenominator = (2 * n) + 1;
 		
+		/* printf("Check: %d == %d?\n", (~n & 1), (n % 2) == 0); */
+		
 		/* if we raise -1 to the the even power, it will be 1, in any other case it will not change itself */
-		double currentElementNumerator = ((n % 2 == 0) ? 1 : -1) * pow(x, currentElementDenominator);
+		/* (~n) & 1 is equivelant to (n % 2 == 0) */
+		double currentElementNumerator = ((~n & 1) ? 1 : -1) * pow(x, currentElementDenominator);
 		
 		currentElement = currentElementNumerator / currentElementDenominator;
 		
@@ -23,13 +26,13 @@ double f(double x, double epsilon) {
 		
 		n++;
 		
-	} while (abs(currentElement) > epsilon);
+	} while (fabs(currentElement) > epsilon);
 	
 	return result;
 	
 }
 
-int main(int argc, char *argv[]) {
+int main() {
 	
 	double epsilon = 1e-5;
 	
