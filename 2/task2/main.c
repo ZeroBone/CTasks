@@ -10,7 +10,7 @@ double ctg(double value) {
 
 double s(double x) {
        
-    double numeratorEl1 = abs(
+    double numeratorEl1 = fabs(
         pow(log10(ctg(x)), 2) -
         (
         (pow(3 * x, .25)) / /* numerator */
