@@ -9,9 +9,6 @@ int readTime() {
 	
 	scanf("%d%*c%d", &hh, &mm);
 	
-	/* printf("hh = %d\n", hh); */
-	/* printf("mm = %d\n", mm); */
-	
 	if (hh > 23) hh = 23;
 	
 	if (mm > 59) mm = 59;
@@ -39,7 +36,7 @@ void printTimePretty(int ts) {
 		
 }
 
-int main(int argc, char *argv[]) {
+int main() {
 	
 	printf("%s", "Enter start time: ");
 	int startTime = readTime();
@@ -91,7 +88,7 @@ int main(int argc, char *argv[]) {
 	
 	int runner = startTime;
 	
-	int endStation = 0;
+	short int endStation = 0;
 	
 	while (runner < endTime) {
 		
@@ -99,9 +96,8 @@ int main(int argc, char *argv[]) {
 		printTimePretty(runner);
 		
 		runner += routeTime + restTime;
-		
-		if (endStation) endStation = 0;
-		else endStation = 1;
+
+		endStation = !endStation;
 		
 	}
 		
