@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-long int factorial(int n) {
+int factorial(int n) {
 	
 	if (n > 1) {
 		
@@ -18,19 +18,28 @@ double f(double x, double epsilon) {
 	
 	double result = 1;
 	
-	int n = 2;
+	int n = 2; /* 0 */
 	
 	double currentElement;
 	
+	double factorialValue = 1;
+	
 	do {
+        
+        factorialValue *= (n - 1) * n;
+        
+        /* printf("factorial = %lf\n", factorialValue); */
+                
+        printf("n: %d Factorials: %lf = %d\n", n, factorialValue, factorial(n));
 		
-		currentElement = pow(x, n) / (double)factorial(n);
+		/* currentElement = pow(x, n) / (double)factorial(n); */
+		currentElement = pow(x, n) / factorialValue;
 		
 		result += currentElement;
 		
 		n += 2;
 		
-	} while (currentElement > epsilon);
+	} while (fabs(currentElement) > epsilon);
 	
 	return result;
 	
@@ -42,7 +51,7 @@ double checkingF(double x) {
 	
 }
 
-int main(int argc, char *argv[]) {
+int main() {
 	
 	/* printf("Fact 6: %ld\n", factorial(6)); */
 	
