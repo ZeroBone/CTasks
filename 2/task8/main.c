@@ -6,27 +6,26 @@ double f(double x, double epsilon) {
 	
 	double result = x;
 	
-	long int n = 1;
+	double current = 1;
 	
-	double currentElement;
+	double xPower = x * x * x;
 	
-	do {
+	int n2plus1 = 3;
+	
+	while (fabs(current) > epsilon) {
 		
-		double currentElementDenominator = (2 * n) + 1;
+		/* current = (flag ? -xPower : xPower) / n2plus1; */
+		current = xPower / n2plus1;
 		
-		/* printf("Check: %d == %d?\n", (~n & 1), (n % 2) == 0); */
+		n2plus1 += 2;
 		
-		/* if we raise -1 to the the even power, it will be 1, in any other case it will not change itself */
-		/* (~n) & 1 is equivelant to (n % 2 == 0) */
-		double currentElementNumerator = ((~n & 1) ? 1 : -1) * pow(x, currentElementDenominator);
+		xPower *= -x * x;
 		
-		currentElement = currentElementNumerator / currentElementDenominator;
+		/* flag = !flag; */
 		
-		result += currentElement;
+		result += current;
 		
-		n++;
-		
-	} while (fabs(currentElement) > epsilon);
+	}
 	
 	return result;
 	
