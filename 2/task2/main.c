@@ -18,16 +18,17 @@ double s(double x) {
         )
     );
     
-    double numeratorEl2 = sqrt(1 / 2 * x);
+    double numeratorEl2 = sqrt(1 / (2 * x));
     
     double numerator = sqrt(numeratorEl1 + numeratorEl2 + 1);
     
     double denominator = exp(-3 * x) + exp(atan(x));
     
     return numerator / denominator;
+    
 }
 
-int main(int argc, char *argv[]) {
+int main() {
     
     double x;
     
@@ -36,6 +37,16 @@ int main(int argc, char *argv[]) {
     scanf("%lf", &x);
     
     printf("Input: x = %lf\n", x);
+    
+    if (fabs(sin(x)) < 1e-5 || ctg(x) < 1e-5 || x < 1e-5) {
+    	
+    	printf("Invalid x input. s is not defined in this point.");
+    	
+    	system("pause");
+    	
+    	return 0;
+    	
+	}
     
     double result = s(x);
     
