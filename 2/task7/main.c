@@ -2,44 +2,23 @@
 #include <stdlib.h>
 #include <math.h>
 
-int factorial(int n) {
-	
-	if (n > 1) {
-		
-		return n * factorial(n - 1);
-		
-	}
-	
-	return 1;
-	
-}
-
 double f(double x, double epsilon) {
 	
 	double result = 1;
 	
-	int n = 2; /* 0 */
+	double previousValue = 1;
 	
-	double currentElement;
+	int n = 2;
 	
-	double factorialValue = 1;
-	
-	do {
-        
-        factorialValue *= (n - 1) * n;
-        
-        /* printf("factorial = %lf\n", factorialValue); */
-                
-        printf("n: %d Factorials: %lf = %d\n", n, factorialValue, factorial(n));
+	while (fabs(previousValue) > epsilon) {
 		
-		/* currentElement = pow(x, n) / (double)factorial(n); */
-		currentElement = pow(x, n) / factorialValue;
+		previousValue *= (x * x / (n * (n - 1)));
 		
-		result += currentElement;
+		result += previousValue;
 		
 		n += 2;
 		
-	} while (fabs(currentElement) > epsilon);
+	}
 	
 	return result;
 	
