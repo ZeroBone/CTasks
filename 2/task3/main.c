@@ -3,7 +3,7 @@
 
 int convertToNumber(int d1, int d2, int d3) {
     
-    return d3 + (d2 * 1e1) + (d1 * 1e2);
+    return d3 + (d2 * 10) + (d1 * 100);
         
 }
 
@@ -21,7 +21,7 @@ int f(int number) {
     
     number /= 10;
     
-    digit1 = number % 10;
+    digit1 = number;/* % 10; */
     
     printf("Digits: %d %d %d\n", digit1, digit2, digit3);
     
@@ -42,27 +42,30 @@ int f(int number) {
     
     }
     
+    /* 2 digits are the same */
+    /* swap digit1 and digit 3 */
+	/* as a matter of fact, the values can be swapped without a temp variable */
+    int temp = digit1;
+    
+    digit1 = digit3;
+    
+    digit3 = temp;
+    
+    return convertToNumber(digit1, digit2, digit3);
+    
     /* we have already handled the case when
     all digits are the same, or all of them are different */
-    if (digit1 == digit3 || digit2 == digit3 || digit1 == digit2) {
+    /*if (digit1 == digit3 || digit2 == digit3 || digit1 == digit2) {
                
-        /* 2 digits are the same */
-        /* swap digit1 and digit 3 */
-        int temp = digit1;
         
-        digit1 = digit3;
-        
-        digit3 = temp;
-        
-        return convertToNumber(digit1, digit2, digit3);
                
     }
     
-    return -1;
+    return -1;*/
     
 }
 
-int main(int argc, char *argv[]) {
+int main() {
     
     int number;
     
