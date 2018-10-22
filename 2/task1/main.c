@@ -3,21 +3,11 @@
 #include <math.h>
 
 double f(int t, int s) {
-       
-    if (t >= s && s > 2 && s <= 4) {
-          
-        return pow(t - s, 1 / 4);
-          
-    }
-    
-    if (t < 0) {
-        
-        return pow(s, 4) + (2 * t);
-              
-    }
-    
-    return t + 2;
-       
+	
+	return (t >= s && s > 2 && s <= 4) ? pow(t - s, 1.0 / 4) : (
+		t < 0 ? pow(s, 4) + (2 * t) : t + 2
+	);
+
 }
 
 int main() {
