@@ -2,37 +2,40 @@
 #include <stdlib.h>
 #include <math.h>
 
-int intPow(int base, int power) {
-	
-	return (int)pow((int)base, (int)power);
-	
-}
+int findMinPowerGreaterThan(int base, double threshold) {
 
-int z_powerOk(int base, int power, int threshold) {
-	
-	return (intPow(base, power) > threshold && intPow(base, power - 1) <= threshold);
-	
+    double value = 1;
+
+    int power = 0;
+
+    while (value <= threshold) {
+
+        value *= base;
+
+        power++;
+
+    }
+
+    return power;
+
 }
 
 /* the greater the enthropy, the more performance on long ranges  */
-int z_findMinPowerGreaterThan(int base, int threshold, int startPower, int enthropy) {
+int z_findMinPowerGreaterThan(int base, double threshold, int startPower, int enthropy) {
 	
 	int power = startPower;
-	
-/*	int leftBorder; */
-/*	int rightBorder; */
 
 	short int toRight = 1;
 	
 	int iterations = 0; /* debug line */
+
+	double powResult, previousPowResult;
 	
 	while (enthropy != 0) {
 		
 		if (toRight) {
-			
-			int powResult = intPow(base, power);
-			
-			int previousPowResult;
+
+			powResult = pow(base, power);
 			
 			while (powResult <= threshold) {
 				
@@ -40,7 +43,7 @@ int z_findMinPowerGreaterThan(int base, int threshold, int startPower, int enthr
 				
 				previousPowResult = powResult;
 				
-				powResult *= intPow(base, enthropy);
+				powResult *= pow(base, enthropy);
 				
 				if (powResult < previousPowResult) {
 					
@@ -57,18 +60,18 @@ int z_findMinPowerGreaterThan(int base, int threshold, int startPower, int enthr
 		}
 		else {
 			
-			int powResult = intPow(base, power - 1);
-			
+			/* int powResult = intPow(base, power - 1); */
+            powResult = pow(base, power - 1);
+
 			while (powResult > threshold) {
 				
-				powResult /= intPow(base, enthropy);
+				powResult /= pow(base, enthropy);
 				
 				power -= enthropy;
 				
 				iterations++;
 				
 			}
-			
 			
 		}
 		
@@ -87,34 +90,28 @@ int z_findMinPowerGreaterThan(int base, int threshold, int startPower, int enthr
 }
 
 int main() {
-	
-	int k;
+
+    double k;
 	
 	printf("Enter k: ");
 	
-	scanf("%d", &k);
-	
-	int enthropy;
-	
-	printf("Enter enthropy value (if you don't know what it is, enter \"4\"): ");
-	
-	scanf("%d", &enthropy);
+	scanf("%lf", &k);
 	
 	/* validation casting */
 	
 	if (k < 0) k = 0;
-	if (enthropy < 1) enthropy = 1;
+	/* if (enthropy < 1) enthropy = 1; */
 	
-	printf("k = %d\n", k);
-	printf("enthropy = %d\n", enthropy);
+	printf("k = %lf\n", k);
+	/* printf("enthropy = %d\n", enthropy); */
 
 	int x = 2;
 	
 	for (; x <= 8; x++) {
 		
-		int minPower = z_findMinPowerGreaterThan(x, k, 0, enthropy);
+		int minPower = findMinPowerGreaterThan(x, k);
 		
-		printf("For x = %d, min power is %d, because %d ^ %d = %d > %d, %d ^ %d = %d <= %d\n", x, minPower, x, minPower, intPow(x, minPower), k, x, minPower - 1, intPow(x, minPower - 1), k);
+		printf("For x = %d, min power is %d, because %d ^ %d = %.lf > %.lf, %d ^ %d = %.lf <= %.lf\n", x, minPower, x, minPower, pow(x, minPower), k, x, minPower - 1, pow(x, minPower - 1), k);
 		
 	}
 	
