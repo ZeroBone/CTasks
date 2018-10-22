@@ -3,35 +3,23 @@
 #include <math.h>
 
 double f(int n, double x) {
-       
-    double result = 0;
-    
-    double sinx = sin(x);
-    
-    int i;
-    
-    for (i = 0; i < n; i++) {
-        
-        double currentExpression = sinx;
-        
-        short int flag = 1; /* 1 means cos, 0 means sin */
-        
-        int j;
-        
-        for (j = 0; j < i; j++) {
-            
-            currentExpression = flag ? cos(currentExpression) : sin(currentExpression);
-            
-            flag = flag ? 0 : 1;
-                
-        }
-        
-        result += currentExpression;
-        
-    }
-    
-    return result;
-           
+	
+	double result = sin(x);
+	
+	char flag = 1;
+	
+	int i;
+	
+	for (i = 1; i < n; i++) {
+		
+		result += flag ? cos(result) : sin(result);
+		
+		flag = !flag;
+		
+	}
+	
+	return result;
+	
 }
 
 int main() {
