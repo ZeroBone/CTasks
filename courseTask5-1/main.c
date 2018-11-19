@@ -1,66 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
 #define MATRIX_X 3
 #define MATRIX_Y 3
 #define ARRAY_SIZE 3
 #define COMPARISON_EPSILON 1e-6
 
+int maxArrayElement(double* array, unsigned int length, int* maxCount, double epsilon);
 void inputDoubleArray(double* arr, unsigned int length);
-
-void outputMatrix(double* matrix, unsigned int y, unsigned int x, char* formatString);
-
-/*void inputArray(void* arr, size_t element, unsigned int length) {
-	
-	switch (element) {
-		
-		case sizeof(double):
-			
-			for (; length > 0; length--) {
-				
-				scanf("%lf", (double*)arr);
-				
-			}
-			
-			break;
-			
-	}
-	
-
-	
-}*/
+void outputArray(double* array, int length);
+void outputMatrix(double* matrix, unsigned int y, unsigned int x);
 
 int main() {
 	
 	double array[ARRAY_SIZE];
 	
-	int x, y, i, maxArrayElementIndex, maxArrayElementCount;
+	int x, y, i, maxArrayEl, maxCount;
 	
 	printf("Enter array (length=%d):\n", ARRAY_SIZE);
 	
 	inputDoubleArray(array, ARRAY_SIZE);
 	
-	maxArrayElementIndex = 0;
-	maxArrayElementCount = 1;
+	maxArrayEl = maxArrayElement(array, ARRAY_SIZE, &maxCount, COMPARISON_EPSILON);
 	
-	for (i = 1; i < ARRAY_SIZE; i++) {
-		
-		if (fabs(array[i]) - fabs(array[maxArrayElementIndex]) < COMPARISON_EPSILON) {
-			
-			maxArrayElementCount++;
-			
-		}
-		else if (fabs(array[i]) > fabs(array[maxArrayElementIndex])) {
-			
-			maxArrayElementIndex = i;
-			maxArrayElementCount = 1;
-			
-		}
-		
-	}
-	
-	if (maxArrayElementCount != 1) {
+	if (maxCount != 1) {
 		
 		printf("There is more than one max element in the array.\n");
 		
@@ -78,7 +41,7 @@ int main() {
 	
 	printf("Matrix:\n");
 	
-	outputMatrix(matrix, MATRIX_Y, MATRIX_X, NULL);
+	outputMatrix(matrix, MATRIX_Y, MATRIX_X);
 	
 	/* double* maxMatrixElements[MATRIX_X * MATRIX_Y]; */
 	int maxMatrixElements[MATRIX_X * MATRIX_Y];
@@ -121,17 +84,43 @@ int main() {
 	for (; offset < pushCounter; offset++) {
 		
 		/* *maxMatrixElements[offset] = array[maxArrayElementIndex]; */
-		matrix[maxMatrixElements[offset] / MATRIX_X][maxMatrixElements[offset] % MATRIX_X] = array[maxArrayElementIndex];
+		matrix[maxMatrixElements[offset] / MATRIX_X][maxMatrixElements[offset] % MATRIX_X] = array[maxArrayEl];
 		
 	}
 	
-	array[maxArrayElementIndex] = maxMatrixElement;
+	array[maxArrayEl] = maxMatrixElement;
 	
-	outputMatrix(matrix, MATRIX_Y, MATRIX_X, NULL);
+	outputMatrix(matrix, MATRIX_Y, MATRIX_X);
 	
 	system("pause");
 	
 	return 0;
+	
+}
+
+int maxArrayElement(double* array, unsigned int length, int *maxCount, double epsilon) {
+	
+	int maxIndex = 0, i;
+	
+	if (maxCount != NULL) *maxCount = 1;
+	
+	for (i = 1; i < length; i++) {
+		
+		if (maxCount != NULL && fabs(array[i]) - fabs(array[maxIndex]) < epsilon) {
+			
+			(*maxCount)++;
+			
+		}
+		else if (fabs(array[i]) > fabs(array[maxIndex])) {
+			
+			maxIndex = i;
+			if (maxCount != NULL) *maxCount = 1;
+			
+		}
+		
+	}
+	
+	return maxIndex;
 	
 }
 
@@ -145,21 +134,27 @@ void inputDoubleArray(double* arr, unsigned int length) {
 	
 }
 
-void outputMatrix(double* matrix, unsigned int y, unsigned int x, char* formatString) {
+void outputArray(double* array, int length) {
 	
-	unsigned int xCounter;
+	int i;
 	
-	if (formatString == NULL) {
+	for (i = 0; i < length; i++) {
 		
-		formatString = "%8.2f";
+		printf("%lf ", array[i]);
 		
 	}
+	
+}
+
+void outputMatrix(double* matrix, unsigned int y, unsigned int x) {
+	
+	unsigned int xCounter;
 	
 	for (; y > 0; y--) {
 		
 		for (xCounter = 0; xCounter < x; xCounter++) {
 			
-			printf(formatString, *matrix++);
+			printf("%8.2f", *matrix++);
 			
 		}
 		
