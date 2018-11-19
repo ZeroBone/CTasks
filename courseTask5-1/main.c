@@ -22,6 +22,8 @@ int main() {
 	inputDoubleArray(array, ARRAY_SIZE);
 	maxArrayEl = maxArrayElement(array, ARRAY_SIZE, &maxCount, COMPARISON_EPSILON);
 	
+	printf("Max array element: %lf Index: %d Count: %d\n", array[maxArrayEl], maxArrayEl, maxCount);
+	
 	if (maxCount != 1) {
 		
 		printf("There is more than one max element in the array.\n");
@@ -100,7 +102,7 @@ int maxArrayElement(const double* array, const unsigned int length, int *maxCoun
 	
 	for (i = 1; i < length; i++) {
 		
-		if (maxCount != NULL && fabs(array[i]) - fabs(array[maxIndex]) < epsilon) {
+		if (maxCount != NULL && (fabs(array[i] - array[maxIndex]) < epsilon)) {
 			
 			(*maxCount)++;
 			
@@ -108,7 +110,10 @@ int maxArrayElement(const double* array, const unsigned int length, int *maxCoun
 		else if (fabs(array[i]) > fabs(array[maxIndex])) {
 			
 			maxIndex = i;
-			if (maxCount != NULL) *maxCount = 1;
+			
+			if (maxCount != NULL) {
+				*maxCount = 1;
+			}
 			
 		}
 		
