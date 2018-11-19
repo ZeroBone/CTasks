@@ -4,17 +4,15 @@
 #define MATRIX_N 3
 
 void inputDoubleArray(double* arr, unsigned int length);
-
-void outputMatrix(double* matrix, unsigned int y, unsigned int x, char* formatString);
-
-void processMatrix(double* matrix, unsigned int sizeY, unsigned int sizeX);
+void outputMatrix(double* matrix, unsigned int y, unsigned int x);
+int positiveElements(double* row, unsigned int rowLength);
 
 int main() {
 	
 	double matrixB[MATRIX_M][MATRIX_N];
 	
 	double matrixC[MATRIX_M][MATRIX_N];
-	int x, y;
+	int y;
 	
 	printf("Enter B(%d,%d) matrix elements:\n", MATRIX_M, MATRIX_N);
 	
@@ -25,38 +23,14 @@ int main() {
 	inputDoubleArray(matrixC, MATRIX_M * MATRIX_N);
 	
 	printf("Matrix B:\n");
-
-	processMatrix(matrixB, MATRIX_M, MATRIX_M);
 	
-	printf("Matrix C:\n");
+	outputMatrix(matrixB, MATRIX_M, MATRIX_N);
 	
-	processMatrix(matrixC, MATRIX_M, MATRIX_M);
+	printf("\n");
 	
-	system("pause");
-	
-	return 0;
-	
-}
-
-void processMatrix(double* matrix, unsigned int sizeY, unsigned int sizeX) {
-	
-	unsigned int x, y, positiveCount;
-	
-	for (y = 0; y < sizeY; y++) {
+	for (y = 0; y < MATRIX_M; y++) {
 		
-		positiveCount = 0;
-		
-		for (x = 0; x < sizeX; x++) {
-			
-			if (matrix[y * sizeX + x] > 0) {
-				
-				positiveCount++;
-				
-			}
-			
-		}
-		
-		if (positiveCount == 2) {
+		if (positiveElements(matrixB[y], MATRIX_N) == 2) {
 			
 			printf("Line %d contains exactly 2 positive values.\n", y + 1);
 			
@@ -67,8 +41,50 @@ void processMatrix(double* matrix, unsigned int sizeY, unsigned int sizeX) {
 			
 		}
 		
+	}
+	
+	printf("Matrix C:\n");
+	
+	outputMatrix(matrixC, MATRIX_M, MATRIX_N);
+	
+	printf("\n");
+	
+	for (y = 0; y < MATRIX_M; y++) {
+		
+		if (positiveElements(matrixC[y], MATRIX_N) == 2) {
+			
+			printf("Line %d contains exactly 2 positive values.\n", y + 1);
+			
+		}
+		else {
+			
+			printf("Line %d doesn't contain 2 positive values.\n", y + 1);
+			
+		}
 		
 	}
+	
+	system("pause");
+	
+	return 0;
+	
+}
+
+int positiveElements(double* row, unsigned int rowLength) {
+	
+	int count = 0;
+	
+	for (; rowLength > 0; rowLength--) {
+		
+		if (*row++ > 0) {
+			
+			count++;
+			
+		}
+		
+	}
+	
+	return count;
 	
 }
 
@@ -82,21 +98,15 @@ void inputDoubleArray(double* arr, unsigned int length) {
 	
 }
 
-void outputMatrix(double* matrix, unsigned int y, unsigned int x, char* formatString) {
+void outputMatrix(double* matrix, unsigned int y, unsigned int x) {
 	
 	unsigned int xCounter;
-	
-	if (formatString == NULL) {
-		
-		formatString = "%8.2f";
-		
-	}
 	
 	for (; y > 0; y--) {
 		
 		for (xCounter = 0; xCounter < x; xCounter++) {
 			
-			printf(formatString, *matrix++);
+			printf("%8.2f", *matrix++);
 			
 		}
 		
