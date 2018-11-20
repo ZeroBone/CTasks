@@ -4,6 +4,7 @@
 #define MATRIX_N 3
 
 void inputDoubleArray(double* arr, unsigned int length);
+void processMatrix(double* matrix, unsigned int sizeY, unsigned int sizeX);
 void outputMatrix(double* matrix, unsigned int y, unsigned int x);
 int positiveElements(double* row, unsigned int rowLength);
 
@@ -12,7 +13,6 @@ int main() {
 	double matrixB[MATRIX_M][MATRIX_N];
 	
 	double matrixC[MATRIX_M][MATRIX_N];
-	int y;
 	
 	printf("Enter B(%d,%d) matrix elements:\n", MATRIX_M, MATRIX_N);
 	
@@ -28,20 +28,7 @@ int main() {
 	
 	printf("\n");
 	
-	for (y = 0; y < MATRIX_M; y++) {
-		
-		if (positiveElements(matrixB[y], MATRIX_N) == 2) {
-			
-			printf("Line %d contains exactly 2 positive values.\n", y + 1);
-			
-		}
-		else {
-			
-			printf("Line %d doesn't contain 2 positive values.\n", y + 1);
-			
-		}
-		
-	}
+	processMatrix(matrixB, MATRIX_M, MATRIX_N);
 	
 	printf("Matrix C:\n");
 	
@@ -49,9 +36,20 @@ int main() {
 	
 	printf("\n");
 	
-	for (y = 0; y < MATRIX_M; y++) {
+	processMatrix(matrixC, MATRIX_M, MATRIX_N);
+	
+	system("pause");
+	
+	return 0;
+	
+}
+
+void processMatrix(double* matrix, unsigned int sizeY, unsigned int sizeX) {
+     
+     int y;
+     for (y = 0; y < MATRIX_M; y++) {
 		
-		if (positiveElements(matrixC[y], MATRIX_N) == 2) {
+		if (positiveElements(matrix + (sizeX * y), sizeX) == 2) {
 			
 			printf("Line %d contains exactly 2 positive values.\n", y + 1);
 			
@@ -63,11 +61,6 @@ int main() {
 		}
 		
 	}
-	
-	system("pause");
-	
-	return 0;
-	
 }
 
 int positiveElements(double* row, unsigned int rowLength) {

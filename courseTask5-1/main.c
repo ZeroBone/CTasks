@@ -6,15 +6,15 @@
 #define ARRAY_SIZE 3
 #define COMPARISON_EPSILON 1e-6
 
-int maxArrayElement(const double* array, const unsigned int length, int* maxCount, const double epsilon);
+double* maxArrayElement(double* array, const unsigned int length, int *maxCount, const double epsilon);
 void inputDoubleArray(double* arr, unsigned int length);
-void outputArray(double* array, int length);
 void outputMatrix(double* matrix, unsigned int y, unsigned int x);
 
 int main() {
 	
 	double array[ARRAY_SIZE];
-	int x, y, i, maxArrayEl, maxCount;
+	int x, y, i, maxCount;
+	double* maxArrayEl;
 	
 	/* array input */
 	
@@ -22,7 +22,11 @@ int main() {
 	inputDoubleArray(array, ARRAY_SIZE);
 	maxArrayEl = maxArrayElement(array, ARRAY_SIZE, &maxCount, COMPARISON_EPSILON);
 	
-	printf("Max array element: %lf Index: %d Count: %d\n", array[maxArrayEl], maxArrayEl, maxCount);
+	printf("Array:\n");
+	
+    outputMatrix(array, 1, ARRAY_SIZE);
+	
+	printf("Max array element: %lf Index: %d Count: %d\n", *maxArrayEl, maxArrayEl - array, maxCount);
 	
 	if (maxCount != 1) {
 		
@@ -37,14 +41,14 @@ int main() {
 	/* matrix i/o */
 	
 	printf("Enter %dx%d matrix elements:\n", MATRIX_Y, MATRIX_X);
-	inputDoubleArray(matrix, MATRIX_Y * MATRIX_X);
+	inputDoubleArray((double*)matrix, MATRIX_Y * MATRIX_X);
 	
 	printf("Matrix:\n");
-	outputMatrix(matrix, MATRIX_Y, MATRIX_X);
+	outputMatrix((double*)matrix, MATRIX_Y, MATRIX_X);
 	
-	double currentElementAbs, maxMatrixElement = fabs(matrix[0][0]);
+/*	double currentElementAbs, maxMatrixElement = fabs(matrix[0][0]);*/
 	
-	int maxMatrixElementIndex = maxArrayElement(matrix, MATRIX_X * MATRIX_Y, &maxCount, COMPARISON_EPSILON);
+	double* maxMatrixElement = maxArrayElement((double*)matrix, MATRIX_X * MATRIX_Y, &maxCount, COMPARISON_EPSILON);
 	
 	if (maxCount != 1) {
 		
@@ -54,14 +58,17 @@ int main() {
 		
 	}
 	
-	temp = array[maxArrayEl];
+	temp = *maxArrayEl;
 	
-	array[maxArrayEl] = *((double*)matrix + maxMatrixElementIndex);
+	*maxArrayEl = *maxMatrixElement;
 	
-	*((double*)matrix + maxMatrixElementIndex) = temp;
+	*maxMatrixElement = temp;
 	
 	printf("Altered matrix:\n");
-	outputMatrix(matrix, MATRIX_Y, MATRIX_X);
+	outputMatrix((double*)matrix, MATRIX_Y, MATRIX_X);
+	
+	printf("New array:\n");
+    outputMatrix(array, 1, ARRAY_SIZE);
 	
 	system("pause");
 	
@@ -94,7 +101,37 @@ int main() {
 	
 }
 
-int maxArrayElement(const double* array, const unsigned int length, int *maxCount, const double epsilon) {
+double* maxArrayElement(double* array, const unsigned int length, int *maxCount, const double epsilon) {
+	
+	double* pointerToMax = array;
+    int i;
+	
+	if (maxCount != NULL) *maxCount = 1;
+	
+	for (i = 1; i < length; i++) {
+		
+        if (maxCount != NULL && (fabs(array[i] - *pointerToMax) < epsilon)) {
+			
+			(*maxCount)++;
+			
+		}
+        else if (fabs(array[i]) > fabs(*pointerToMax)) {
+			
+			pointerToMax = array + i;
+			
+			if (maxCount != NULL) {
+				*maxCount = 1;
+			}
+			
+		}
+		
+	}
+	
+	return pointerToMax;
+	
+}
+
+/*int maxArrayElement(const double* array, const unsigned int length, int *maxCount, const double epsilon) {
 	
 	int maxIndex = 0, i;
 	
@@ -121,25 +158,13 @@ int maxArrayElement(const double* array, const unsigned int length, int *maxCoun
 	
 	return maxIndex;
 	
-}
+}*/
 
 void inputDoubleArray(double* arr, unsigned int length) {
 	
 	for (; length > 0; length--) {
 		
 		scanf("%lf", arr++);
-		
-	}
-	
-}
-
-void outputArray(double* array, int length) {
-	
-	int i;
-	
-	for (i = 0; i < length; i++) {
-		
-		printf("%lf ", array[i]);
 		
 	}
 	
