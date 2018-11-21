@@ -13,8 +13,10 @@ void outputMatrix(double* matrix, unsigned int y, unsigned int x);
 int main() {
 	
 	double array[ARRAY_SIZE];
-	int x, y, i, maxCount;
+	double matrix[MATRIX_Y][MATRIX_X], temp;
+	int maxCount;
 	double* maxArrayEl;
+	double* maxMatrixElement;
 	
 	/* array input */
 	
@@ -36,8 +38,6 @@ int main() {
 		
 	}
 	
-	double matrix[MATRIX_Y][MATRIX_X], temp;
-	
 	/* matrix i/o */
 	
 	printf("Enter %dx%d matrix elements:\n", MATRIX_Y, MATRIX_X);
@@ -48,7 +48,7 @@ int main() {
 	
 /*	double currentElementAbs, maxMatrixElement = fabs(matrix[0][0]);*/
 	
-	double* maxMatrixElement = maxArrayElement((double*)matrix, MATRIX_X * MATRIX_Y, &maxCount, COMPARISON_EPSILON);
+	maxMatrixElement = maxArrayElement((double*)matrix, MATRIX_X * MATRIX_Y, &maxCount, COMPARISON_EPSILON);
 	
 	if (maxCount != 1) {
 		
@@ -73,31 +73,6 @@ int main() {
 	system("pause");
 	
 	return 0;
-	
-	/*for (y = 0; y < MATRIX_Y; y++) {
-		
-		for (x = 0; x < MATRIX_X; x++) {
-			
-			currentElementAbs = fabs(matrix[y][x]);
-			
-			
-			if (currentElementAbs > maxMatrixElement) {
-				
-				maxMatrixElement = currentElementAbs;
-				maxMatrixElements[pushCounter] = y * MATRIX_X + x;
-				
-				offset = pushCounter++;
-				
-			}
-			else if (fabs(currentElementAbs - maxMatrixElement) < COMPARISON_EPSILON) {
-			
-				maxMatrixElements[pushCounter++] = y * MATRIX_X + x;
-				
-			}
-			
-		}
-		
-	}*/
 	
 }
 
