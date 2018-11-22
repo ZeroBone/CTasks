@@ -47,7 +47,7 @@ int main() {
 void processMatrix(double* matrix, unsigned int sizeY, unsigned int sizeX) {
      
      int y;
-     for (y = 0; y < MATRIX_M; y++) {
+     for (y = 0; y < sizeY; y++) {
 		
 		if (positiveElements(matrix + (sizeX * y), sizeX) == 2) {
 			
