@@ -41,10 +41,10 @@ int main() {
 	/* matrix i/o */
 	
 	printf("Enter %dx%d matrix elements:\n", MATRIX_Y, MATRIX_X);
-	inputDoubleArray((double*)matrix, MATRIX_Y * MATRIX_X);
+	inputDoubleArray(matrix, MATRIX_Y * MATRIX_X);
 	
 	printf("Matrix:\n");
-	outputMatrix((double*)matrix, MATRIX_Y, MATRIX_X);
+	outputMatrix(matrix, MATRIX_Y, MATRIX_X);
 	
 /*	double currentElementAbs, maxMatrixElement = fabs(matrix[0][0]);*/
 	
@@ -65,7 +65,7 @@ int main() {
 	*maxMatrixElement = temp;
 	
 	printf("Altered matrix:\n");
-	outputMatrix((double*)matrix, MATRIX_Y, MATRIX_X);
+	outputMatrix(matrix, MATRIX_Y, MATRIX_X);
 	
 	printf("New array:\n");
     outputMatrix(array, 1, ARRAY_SIZE);
