@@ -8,6 +8,21 @@ double integral(double start, double end, double n, double (*f)(double));
 double f1(double);
 double f2(double);
 
+/*
+
+from -2 to 2
+
+f(x) = 1
+result: 4.000000
+
+f(x) = x
+result: -0.000000
+
+f(x) = |x|
+result: 4.000000
+
+*/
+
 int main() {
 	
 	printf("F1 integral: %lf\n", integral(-2, 2, N, f1));
