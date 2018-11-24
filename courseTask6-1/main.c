@@ -61,12 +61,12 @@ void reverseString(char* string, int from, int to) {
     
     while (from < to) {
     	
-    	string[from] ^= string[to];
-    	string[to] ^= string[from];
-    	string[from] ^= string[to];
-        
-        from++; 
-        to--; 
+		string[from] ^= string[to];
+		string[to] ^= string[from];
+		string[from] ^= string[to];
+		
+		from++; 
+		to--; 
         
     }
     
