@@ -22,7 +22,8 @@ int main() {
 	
 	while (string[i] != '\0') {
 		
-		if (string[i] == POINT) {
+		if (string[i] == ' ') {}
+		else if (string[i] == POINT) {
 			
 			foundPoint = 1;
 			
