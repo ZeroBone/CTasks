@@ -59,36 +59,36 @@ void swapFirstLastWords(char* string, int length, const char wordSeparator) {
 
 void reverseString(char* string, int from, int to) {
     
-    while (from < to) {
-    	
+	while (from < to) {
+		
 		string[from] ^= string[to];
 		string[to] ^= string[from];
 		string[from] ^= string[to];
 		
 		from++; 
 		to--; 
-        
-    }
+	    
+	}
     
 }
 
 void rotateStringLeft(char *string, int length, int amount) {
 	
-    reverseString(string, 0, amount - 1);
-    
-    reverseString(string, amount, length - 1);
-    
-    reverseString(string, 0, length - 1);
+	reverseString(string, 0, amount - 1);
+	
+	reverseString(string, amount, length - 1);
+	
+	reverseString(string, 0, length - 1);
     
 }
 
 void rotateStringRight(char *string, int length, int amount) {
 	
-    reverseString(string, 0, length - 1);
-    
-    reverseString(string, 0, amount - 1);
-    
-    reverseString(string, amount, length - 1);
+	reverseString(string, 0, length - 1);
+	
+	reverseString(string, 0, amount - 1);
+	
+	reverseString(string, amount, length - 1);
     
 }
 
