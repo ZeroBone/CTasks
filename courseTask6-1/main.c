@@ -52,6 +52,47 @@ void swapFirstLastWords(char* string, int length, const char wordSeparator) {
 	
 }
 
+void reverseString(char* string, int start, int end) {
+	
+    /* char temp; */
+    
+    while (start < end) {
+    	
+    	string[start] ^= string[end];
+    	string[end] ^= string[start];
+    	string[start] ^= string[end];
+    	
+		/*temp = string[start];
+        string[start] = string[end]; 
+        string[end] = temp;*/
+        
+        start++; 
+        end--; 
+        
+    }
+    
+}
+
+void rotateStringLeft(char *string, int length, int amount) {
+	
+    reverseString(string, 0, amount - 1);
+    
+    reverseString(string, amount, length - 1);
+    
+    reverseString(string, 0, length - 1);
+    
+}
+
+void rotateStringRight(char *string, int length, int amount) {
+	
+    reverseString(string, 0, length - 1);
+    
+    reverseString(string, 0, amount - 1);
+    
+    reverseString(string, amount, length - 1);
+    
+}
+
 void swapFirstLastStringParts(char* string, int realLength, int firstLength, int lastLength) {
 	
 	if (firstLength + lastLength > realLength) {
@@ -87,46 +128,36 @@ void swapFirstLastStringParts(char* string, int realLength, int firstLength, int
 	}
 	
 	int delta = lastLength - firstLength;
-	int i;
-	int middleLength = realLength - lastLength - firstLength;
-	
-	/*
-	first we need to copy the part of the fragment with the minimum length
-	then we need to shift the middle part to the right by delta (obviously, delta can be negative)
-	*/
+	int minLength = lastLength < firstLength ? lastLength : firstLength;
+	int i, p1, p2;
 	
 	if (delta > 0) {
 		
-		/*
-		last fragment is longer than the first one
-		so we need to copy the first fragment to the end of the string and
-		then copy first delta char's of last fragment to the beginning of the string
-		*/
+		/* last fragment is longer than the first one */
 		
-		for (i = 0; i < firstLength; i++) {
-			
-			string[length - 1 - firstLength + i] ^= string[i];
-			string[i] ^= string[length - 1 - firstLength + i];
-			string[length - 1 - firstLength + i] ^= string[i];
-			
-		}
+		p1 = 0;
+		p2 = realLength - minLength;
+				
+	}
+	else {
 		
-		for (i = 0; i < delta; i++) {
-			
-			string[i] = string[length - 1 - lastLength + i];
-			
-		}
-		
-		/* take the delimiter before the last fragment to figure out, what is placed between words*/
-		string[length - 2 - firstLength] = string[length - 2 - lastLength];
-		
-		for (i = 0; i < middleLength; i++) {
-			
-			string[firstLength + middleLength + 1 + i] = string[firstLength + 1 + i];
-			string[firstLength + 1 + i] = ' ';
-			
-		}
+		p1 = realLength - minLength;
+		p2 = 0;
 		
 	}
+	
+	for (i = 0; i < minLength; i++) {
+			
+		string[p1] ^= string[p2];
+		string[p2] ^= string[p1];
+		string[p1] ^= string[p2];
+		
+		p1++;
+		p2++;
+		
+	}
+	
+	if (delta > 0) rotateStringRight(string, realLength - minLength, delta);
+	else rotateStringLeft(string + minLength, realLength - minLength, -delta);
 	
 }
