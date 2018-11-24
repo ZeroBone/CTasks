@@ -2,10 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #define MAX_INPUT_LENGTH 50
+#define SPACE ' '
+
+void swapFirstLastWords(char* string, int length, const char wordSeparator);
+void reverseString(char* string, int start, int end);
+void rotateStringLeft(char *string, int length, int amount);
+void rotateStringRight(char *string, int length, int amount);
+void swapFirstLastStringParts(char* string, int realLength, int firstLength, int lastLength);
 
 int main() {
-	
-	const char SPACE = ' ';
 	
 	char str[MAX_INPUT_LENGTH];
 	
@@ -52,22 +57,16 @@ void swapFirstLastWords(char* string, int length, const char wordSeparator) {
 	
 }
 
-void reverseString(char* string, int start, int end) {
-	
-    /* char temp; */
+void reverseString(char* string, int from, int to) {
     
-    while (start < end) {
+    while (from < to) {
     	
-    	string[start] ^= string[end];
-    	string[end] ^= string[start];
-    	string[start] ^= string[end];
-    	
-		/*temp = string[start];
-        string[start] = string[end]; 
-        string[end] = temp;*/
+    	string[from] ^= string[to];
+    	string[to] ^= string[from];
+    	string[from] ^= string[to];
         
-        start++; 
-        end--; 
+        from++; 
+        to--; 
         
     }
     
@@ -140,6 +139,8 @@ void swapFirstLastStringParts(char* string, int realLength, int firstLength, int
 				
 	}
 	else {
+		
+		/* first fragment is longer than the last one */
 		
 		p1 = realLength - minLength;
 		p2 = 0;
