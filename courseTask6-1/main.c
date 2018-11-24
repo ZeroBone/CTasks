@@ -1,57 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define MAX_INPUT_LENGTH 50
 
 int main() {
 	
 	const char SPACE = ' ';
 	
-	char str[50];
+	char str[MAX_INPUT_LENGTH];
 	
 	printf("Enter string:");
 	
 	/* scanf("%s", &str); */
-	gets(str);
+	fgets(str, MAX_INPUT_LENGTH, stdin);
 	
 	/* printf("String: %s\n", str); */
 	printf("String: ");
 	puts(str);
 	
-	char* firstSpace = strchr(str, SPACE);
-	char* lastSpace = strrchr(str, SPACE);
+	int stringLength = strlen(str);
 	
-	char *newString = (char*)malloc((strlen(str) + 1) * sizeof(char));
+	printf("Length: %d\n", stringLength);
+	printf("LastChar: %c\n", str[stringLength - 2]);
 	
-	/* strcpy(newString, str); */
+	int firstWordLength = 0;
 	
-	char* pointer = newString;
+	while (str[firstWordLength] != SPACE && str[firstWordLength + 1] != '\0') firstWordLength++;
 	
-	printf("DEBUG: %d\n",  firstSpace - str);
+	printf("First word length: %d\n", firstWordLength);
 	
-	memcpy(newString, lastSpace + 1, str + strlen(str) - lastSpace);
+	int lastWordLength = 0;
 	
-	pointer += str + strlen(str) - lastSpace;
+	while (str[stringLength - 2 - lastWordLength] != SPACE && stringLength - 1 - lastWordLength > 0) lastWordLength++;
 	
-	/* TODO: fix bug */
-	
-	if (firstSpace != lastSpace) {
-		
-		memcpy(pointer, firstSpace + 1, lastSpace - firstSpace);
-		
-	}
-	
-	/*while (pointer != firstSpace) {
-		
-		*pointer++ = *(lastSpace + (pointer - str));
-		
-	}*/
-	
-	/* strncat(newString, str, firstSpace - str);*/
+	printf("Last word length: %d\n", lastWordLength);
 	
 	printf("New string: ");
-	puts(newString);
-	
-	printf("New string length: %d\n", strlen(newString));
+	puts(str);
 	
 	system("pause");
 	
