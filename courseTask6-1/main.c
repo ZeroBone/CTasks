@@ -5,10 +5,6 @@
 #define SPACE ' '
 
 void swapFirstLastWords(char* string, int length, const char wordSeparator);
-void reverseString(char* string, int start, int end);
-void rotateStringLeft(char *string, int length, int amount);
-void rotateStringRight(char *string, int length, int amount);
-void swapFirstLastStringParts(char* string, int realLength, int firstLength, int lastLength);
 
 int main() {
 	
@@ -38,6 +34,11 @@ int main() {
 	return 0;
 	
 }
+
+void reverseString(char* string, int start, int end);
+void rotateStringLeft(char *string, int length, int amount);
+void rotateStringRight(char *string, int length, int amount);
+void swapFirstLastStringParts(char* string, int realLength, int firstLength, int lastLength);
 
 void swapFirstLastWords(char* string, int length, const char wordSeparator) {
 	

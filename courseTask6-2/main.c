@@ -17,10 +17,49 @@ int main() {
 	printf("String: ");
 	puts(string);
 	
-	int i = 0;
+	/*printf("TEST à: %c\n", 224);
+	printf("à: %d\n", 'à');
+	printf("ÿ: %d\n", 'ÿ');*/
+	
+	char* pointer = string;
+	
+	while ((pointer = strchr(pointer, POINT)) != NULL) {
+		
+		pointer++;
+		
+		if (*(pointer + 1) == '\0') {
+			
+			break;
+			
+		} 
+		
+		while (*pointer == ' ') pointer++;
+		
+		printf("%c\n", *pointer);
+		
+		if ((*pointer) >= -96 && (*pointer) <= -17) {
+				
+			/* printf("Russian letter %c\n", *pointer); */
+			
+			*pointer = ('À' + (*pointer) - 'à');
+			
+		}
+		else if ((*pointer) >= 'a' && (*pointer) <= 'z') {
+			
+			*pointer = ('A' + (*pointer) - 'a');
+			
+		}
+		
+		/* pointer++; */
+		
+	}
+	
+	/*int i = 0;
 	char foundPoint = 0;
 	
 	while (string[i] != '\0') {
+		
+		printf("Char %c: %d\n", string[i], string[i]);
 		
 		if (string[i] == ' ') {}
 		else if (string[i] == POINT) {
@@ -30,15 +69,16 @@ int main() {
 		}
 		else if (foundPoint) {
 			
-			/*if (strtolower(string[i]) == string[i]) {
+			if (string[i] >= -96 && string[i] <= -17) {
 				
-				string[i] = strtoupper(string[i]);
+				printf("Russian letter %c\n", string[i]);
 				
-			}*/
-			
-			if (string[i] < 65 || string[i] > 90) {
+				string[i] = ('À' + string[i] - 'à');
 				
-				string[i] += ('A' - 'a');
+			}
+			else if (string[i] >= 'a' && string[i] <= 'z') {
+				
+				string[i] = ('A' + string[i] - 'a');
 				
 			}
 			
@@ -48,7 +88,7 @@ int main() {
 		
 		i++;
 		
-	}
+	}*/
 	
 	printf("Modified string: ");
 	
