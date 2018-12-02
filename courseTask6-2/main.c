@@ -7,23 +7,15 @@
 /*
 Enter string:winter. Has come.it's cold outside.
 String: winter. Has come.it's cold outside.
-
 Modified string: winter. Has come.It's cold outside.
-
 =====================
-
 Enter string:.л.е.м.м.а
 String: .л.е.м.м.а
-
 Modified string: .Л.Е.М.М.А
-
 =====================
-
 Enter string:электрон, атом. молекула
 String: электрон, атом. молекула
-
 Modified string: электрон, атом. Молекула
-
 */
 
 int main() {
@@ -49,13 +41,13 @@ int main() {
 		
 		pointer++;
 		
-		if (*(pointer + 1) == '\0') {
+		while (*pointer == ' ') pointer++;
+		
+		if (*pointer == '\0') {
 			
 			break;
 			
 		} 
-		
-		while (*pointer == ' ') pointer++;
 		
 		/* printf("%d\n", *pointer); */
 		
