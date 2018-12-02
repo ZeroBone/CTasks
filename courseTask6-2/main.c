@@ -12,17 +12,17 @@ Modified string: winter. Has come.It's cold outside.
 
 =====================
 
-Enter string:.ë.å.ì.ì.à
-String: .ë.å.ì.ì.à
+Enter string:.Ð».Ðµ.Ð¼.Ð¼.Ð°
+String: .Ð».Ðµ.Ð¼.Ð¼.Ð°
 
-Modified string: .Ë.Å.Ì.Ì.À
+Modified string: .Ð›.Ð•.Ðœ.Ðœ.Ð
 
 =====================
 
-Enter string:ýëåêòðîí, àòîì. ìîëåêóëà
-String: ýëåêòðîí, àòîì. ìîëåêóëà
+Enter string:ÑÐ»ÐµÐºÑ‚Ñ€Ð¾Ð½, Ð°Ñ‚Ð¾Ð¼. Ð¼Ð¾Ð»ÐµÐºÑƒÐ»Ð°
+String: ÑÐ»ÐµÐºÑ‚Ñ€Ð¾Ð½, Ð°Ñ‚Ð¾Ð¼. Ð¼Ð¾Ð»ÐµÐºÑƒÐ»Ð°
 
-Modified string: ýëåêòðîí, àòîì. Ìîëåêóëà
+Modified string: ÑÐ»ÐµÐºÑ‚Ñ€Ð¾Ð½, Ð°Ñ‚Ð¾Ð¼. ÐœÐ¾Ð»ÐµÐºÑƒÐ»Ð°
 
 */
 
@@ -39,9 +39,9 @@ int main() {
 	printf("String: ");
 	puts(string);
 	
-	/*printf("TEST à: %c\n", 224);
-	printf("à: %d\n", 'à');
-	printf("ÿ: %d\n", 'ÿ');*/
+	/*printf("TEST Ð°: %c\n", 224);
+	printf("Ð°: %d\n", 'Ð°');
+	printf("Ñ: %d\n", 'Ñ');*/
 	
 	char* pointer = string;
 	
@@ -63,7 +63,7 @@ int main() {
 				
 			/* printf("Russian letter %c\n", *pointer); */
 			
-			*pointer = ('À' + (*pointer) - 'à');
+			*pointer = ('Ð' + (*pointer) - 'Ð°');
 			
 		}
 		else if ((*pointer) >= 'a' && (*pointer) <= 'z') {
@@ -95,7 +95,7 @@ int main() {
 				
 				printf("Russian letter %c\n", string[i]);
 				
-				string[i] = ('À' + string[i] - 'à');
+				string[i] = ('Ð' + string[i] - 'Ð°');
 				
 			}
 			else if (string[i] >= 'a' && string[i] <= 'z') {
