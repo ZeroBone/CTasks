@@ -4,6 +4,28 @@
 #define MAX_INPUT_LENGTH 50
 #define POINT '.'
 
+/*
+Enter string:winter. Has come.it's cold outside.
+String: winter. Has come.it's cold outside.
+
+Modified string: winter. Has come.It's cold outside.
+
+=====================
+
+Enter string:.л.е.м.м.а
+String: .л.е.м.м.а
+
+Modified string: .Л.Е.М.М.А
+
+=====================
+
+Enter string:электрон, атом. молекула
+String: электрон, атом. молекула
+
+Modified string: электрон, атом. Молекула
+
+*/
+
 int main() {
 	
 	char string[MAX_INPUT_LENGTH];
@@ -35,7 +57,7 @@ int main() {
 		
 		while (*pointer == ' ') pointer++;
 		
-		printf("%c\n", *pointer);
+		/* printf("%d\n", *pointer); */
 		
 		if ((*pointer) >= -96 && (*pointer) <= -17) {
 				
