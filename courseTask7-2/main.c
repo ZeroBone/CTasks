@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <locale.h>
 #include <windows.h>
 #include <math.h>
@@ -61,20 +62,36 @@ int main() {
 	
 	printf("This is a %dx%d matrix.\n", count, count);
 	
-	int x, y;
+	fseek(inputFile, 0, SEEK_SET);
+	
+	int x, y, value;
 	
 	for (y = 0; y < count; y++) {
 		
 		for (x = 0; x < count; x++) {
 			
+			value = fscanf(inputFile, "%d", &matrixElement);
+			
+			printf("Current value: %d\n", matrixElement);
+			
+			if (value == EOF) {
+				
+				perror("Error writing matrix");
+		
+				system("pause");
+				
+				return 3;
+				
+			}
+			
 			if (x == count - 1) {
 				
-				fprintf(outputFile, "%.2f\n", 1.0);
+				fprintf(outputFile, "%.2f\n", (double)matrixElement);
 				
 			}
 			else {
 				
-				fprintf(outputFile, "%.2f ", 1.19);
+				fprintf(outputFile, "%.2f ", (double)matrixElement);
 				
 			}
 			
