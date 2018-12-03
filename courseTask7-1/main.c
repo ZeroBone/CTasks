@@ -50,11 +50,13 @@ int main(int argc, char *argv[]) {
 		
 		system("pause");
 		
-		return 1;
+		return 2;
 		
 	}
 	
-	int currentSymbol, phraseStartPosition, currentPosition, temp, phraseLength;
+	int currentSymbol, phraseStartPosition, currentPosition, phraseLength;
+	char *phrase;
+	/* int temp; */
 	
 	phraseStartPosition = 0; /* ftell(inputFile); */
 	
@@ -75,7 +77,17 @@ int main(int argc, char *argv[]) {
 			
 			phraseLength = currentPosition - phraseStartPosition;
 			
-			char* phrase = (char*)malloc(phraseLength * sizeof(char) + sizeof(char)); /* +1 for null-terminator */
+			phrase = (char*)malloc(phraseLength * sizeof(char) + sizeof(char)); /* +1 for null-terminator */
+			
+			if (phrase == NULL) {
+				
+				perror("Could not allocate enouph memory for the phrase");
+		
+				system("pause");
+				
+				return 3;
+				
+			}
 			
 			phrase[phraseLength - 1] = '\0';
 			
@@ -89,6 +101,8 @@ int main(int argc, char *argv[]) {
 				fwrite(phrase, sizeof(char), phraseLength, tempFile);
 				
 			}
+			
+			free(phrase);
 			
 			if (currentSymbol == EOF) break;
 			
