@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
 		printf("Enter input file name:\n");
 		
 		fgets(inputFileName, MAX_FNAME_LENGTH, stdin);
+		inputFileName[strlen(inputFileName) - 1] = '\0';
 		
 	}
 	else {
@@ -129,6 +130,9 @@ int main(int argc, char *argv[]) {
 	
 	fclose(inputFile);
 	fclose(tempFile);
+	
+	unlink(inputFileName);
+	rename("temp.txt", inputFileName);
 	
 	system("pause");
 	
