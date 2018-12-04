@@ -49,7 +49,7 @@ int main() {
 		
 		scanf("%lf", &currentValue);
 		
-		p = malloc(sizeof(double));
+		/*p = malloc(sizeof(double));
 		
 		if (p == NULL) {
 		
@@ -61,9 +61,9 @@ int main() {
 			
 		}
 		
-		*p = currentValue;
+		*p = currentValue;*/
 		
-		fwrite(p, sizeof(double), 1, outputFile);
+		fwrite(&currentValue, sizeof(double), 1, outputFile);
 		
 		/*for (j = 0; j < sizeof(double); j++) {
 			
@@ -71,7 +71,6 @@ int main() {
 			
 		}*/
 		
-		free(p);
 		
 	}
 	

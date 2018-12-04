@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #define MAX_FNAME_LENGTH 50
+#define EPSILON 1e-6
 
 void printFile(FILE*);
 
@@ -43,29 +45,39 @@ int main() {
 	
 	/* alter the contents */
 	
-	fseek(inputFile, 0, SEEK_SET);
-	
-	double current;
-	
-	while (fread(&current, sizeof(double), 1, inputFile) >= 1) {
+	if (fabs(first) > EPSILON || fabs(last) > EPSILON) {
 		
-		fseek(inputFile, -sizeof(double), SEEK_CUR);
+		fseek(inputFile, 0, SEEK_SET);
+	
+		double current;
 		
-		if (current > 0) {
+		while (fread(&current, sizeof(double), 1, inputFile) == 1) {
 			
-			current += first;
+			if (fabs(current) < EPSILON) {
+				
+				continue;
+				
+			}
+			
+			fseek(inputFile, -sizeof(double), SEEK_CUR);
+			
+			if (current > 0) {
+				
+				current += first;
+				
+			}
+			else {
+				
+				current -= last;
+				
+			}
+			
+			fwrite(&current, sizeof(double), 1, inputFile);
+			fseek(inputFile, 0, SEEK_CUR);
+			
+			/* fseek(inputFile, sizeof(double), SEEK_CUR); */
 			
 		}
-		else {
-			
-			current -= last;
-			
-		}
-		
-		fwrite(&current, sizeof(double), 1, inputFile);
-		fseek(inputFile, 0, SEEK_CUR);
-		
-		/* fseek(inputFile, sizeof(double), SEEK_CUR); */
 		
 	}
 	

@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 				
 			}
 			
-			phrase[phraseLength - 1] = '\0';
+			phrase[phraseLength] = '\0';
 			
 			fread(phrase, sizeof(char), phraseLength, inputFile);
 			
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
 			
 			fseek(inputFile, currentPosition, SEEK_SET);
 			
-			phraseStartPosition = currentPosition + 1;
+			phraseStartPosition = currentPosition;
 			
 			/*do {
 				
@@ -131,8 +131,8 @@ int main(int argc, char *argv[]) {
 	fclose(inputFile);
 	fclose(tempFile);
 	
-	unlink(inputFileName);
-	rename("temp.txt", inputFileName);
+	/* unlink(inputFileName);
+	rename("temp.txt", inputFileName); */
 	
 	system("pause");
 	
@@ -144,15 +144,18 @@ char phraseOk(char* phrase) {
 	
 	int d;
 	
-	if (sscanf(phrase, "%d", &d) || sscanf(phrase, "%d-é", &d)) return 1;
+	if (sscanf(phrase, "%d.", &d) || sscanf(phrase, "%d-é.", &d) || sscanf(phrase, "%d ", &d) || sscanf(phrase, "%d-é ", &d)) return 1;
 	
-	while (*phrase++ != '\0') {
+	while (*phrase != '\0') {
 		
-		if (*phrase == ' ') {
+		if (*phrase == ' ' || *phrase == '\n') {
 			
-			if (sscanf(phrase, "%d", &d) || sscanf(phrase, "%d-é", &d)) return 1;
+			phrase++;
+			
+			if (sscanf(phrase, "%d.", &d) || sscanf(phrase, "%d-é.", &d) || sscanf(phrase, "%d ", &d) || sscanf(phrase, "%d-é ", &d)) return 1;
 			
 		}
+		else phrase++;
 		
 	}
 	

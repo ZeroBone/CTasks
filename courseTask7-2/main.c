@@ -15,6 +15,7 @@ int main() {
 	
 	char inputFileName[MAX_FNAME_LENGTH];
 	char *outputFileName = "output.txt";
+	char doubleContainer[20];
 	
 	FILE *inputFile, *outputFile;
 	
@@ -48,29 +49,52 @@ int main() {
 	
 	/* file streams opened */
 	
-	int matrixElement, count = 0;
+	int matrixElement, count = 0, xCount = 0, yCount = 1;
+	int x, y, value, i, doubleSLength;
+	int maxColumnWidth = 0;
 	
 	while (fscanf(inputFile, "%d", &matrixElement) != EOF) {
 		
+		count++;
+		
+		if (fgetc(inputFile) == '\n') {
+			
+			yCount++;
+			
+		}
+		
 		printf("Current matrix element: %d\n", matrixElement);
 		
-		count++;
+		/* calculate max width */
+		
+		/* printf("(COUNTING) Current value: %d\n", matrixElement); */
+			
+		doubleSLength = sprintf(doubleContainer, "%.2f", (double)matrixElement);
+		puts(doubleContainer);
+		
+		/* doubleSLength = strlen(doubleContainer); */
+		
+		printf("(COUNTING) Current value length: %d\n", doubleSLength);
+		
+		if (doubleSLength > maxColumnWidth) maxColumnWidth = doubleSLength;
 		
 	}
 	
-	count = sqrt(count);
+	xCount = count / yCount;
 	
-	printf("This is a %dx%d matrix.\n", count, count);
+	printf("This is a %dx%d matrix.\n", yCount, xCount);
+	
+	printf("Max column width: %d\n", maxColumnWidth);
 	
 	fseek(inputFile, 0, SEEK_SET);
 	
-	int x, y, value;
-	
-	for (y = 0; y < count; y++) {
+	for (y = 0; y < yCount; y++) {
 		
-		for (x = 0; x < count; x++) {
+		for (x = 0; x < xCount; x++) {
 			
 			value = fscanf(inputFile, "%d", &matrixElement);
+			
+			if (fgetc(inputFile) != '\n') fseek(inputFile, -1, SEEK_CUR);
 			
 			printf("Current value: %d\n", matrixElement);
 			
@@ -82,22 +106,35 @@ int main() {
 				
 				return 3;
 				
+				/* goto break2; */
+				
 			}
 			
-			if (x == count - 1) {
+			printf("Value: %d x: %d count: %d\n", matrixElement, x, xCount);
+			
+			/*if (x == xCount - 2) {
 				
 				fprintf(outputFile, "%.2f\n", (double)matrixElement);
 				
-			}
-			else {
+			}*/
+			
+			doubleSLength = sprintf(doubleContainer, "%.2f", (double)matrixElement);
 				
-				fprintf(outputFile, "%.2f ", (double)matrixElement);
+			for (i = maxColumnWidth + (x != 0) - doubleSLength; i > 0; i--) {
+				
+				fputc(' ', outputFile);
 				
 			}
+			
+			/*fprintf(outputFile, "%s", doubleContainer);*/
+			fputs(doubleContainer, outputFile);
+			
+			if (x == xCount - 1) fputc('\n', outputFile);
 			
 		}
 		
 	}
+	/*break2: */
 	
 	fclose(inputFile);
 	fclose(outputFile);
