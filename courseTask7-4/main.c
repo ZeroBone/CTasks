@@ -5,23 +5,28 @@
 #include <string.h>
 #define MAX_FNAME_LENGTH 50
 #define MAX_STUDENT_LAST_NAME_LENGTH 20
+#define STUDENT_COMPONENT_LENGTH 27
 
 struct ZString {
 	unsigned long int length;
 	char* str;
 };
 
-int mainMenu();
-unsigned char readMark();
-char markValid(unsigned char mark);
-int fileViewMenu(FILE *file);
-void writeZString(FILE *file, struct ZString *str);
-void toZString(char* str, struct ZString *zString);
-
 struct Student {
 	struct ZString name;
 	unsigned char marks[3];
 };
+
+int mainMenu();
+unsigned char readMark();
+char markValid(unsigned char mark);
+int fileViewMenu(char *fileName);
+void writeStudent(FILE *file, struct Student *student);
+void writeZString(FILE *file, struct ZString *str);
+void toZString(char* str, struct ZString *zString);
+void writeInt(FILE *file, long int value);
+
+
 
 int main(int argc, char *argv[]) {
 	
@@ -68,8 +73,6 @@ int mainMenu() {
 			
 			FILE *outputFile;
 			
-			puts(outputFileName);
-			
 			if ((outputFile = fopen(outputFileName, "wb")) == NULL) {
 				
 				perror("An error occurred while trying to open the output file for writing");
@@ -78,9 +81,7 @@ int mainMenu() {
 				
 			}
 			
-			int studentCount = 0;
-			
-			fwrite(&studentCount, sizeof(int), 1, outputFile);
+			writeInt(outputFile, 0); /* student count */
 			
 			fclose(outputFile);
 			
@@ -99,21 +100,9 @@ int mainMenu() {
 			fgets(fileName, MAX_FNAME_LENGTH, stdin);
 			fileName[strlen(fileName) - 1] = '\0';
 			
-			FILE *file;
+			while (fileViewMenu(fileName) == 1);
 			
-			if ((file = fopen(fileName, "rb")) == NULL) {
-				
-				perror("An error occurred while trying to file for reading");
-				
-				return 1;
-				
-			}
-			
-			while (fileViewMenu(file) == 1);
-			
-			fclose(file);
-			
-			break;
+			return 1;
 			
 		case 3:
 			return 0;
@@ -130,7 +119,9 @@ int mainMenu() {
 	
 }
 
-int fileViewMenu(FILE *file) {
+int fileViewMenu(char *fileName) {
+	
+	FILE *file;
 	
 	puts("Please enter a number below to select what you want to do:");
 	puts("1 - view file.");
@@ -150,6 +141,16 @@ int fileViewMenu(FILE *file) {
 		
 		case 2:
 			
+			if ((file = fopen(fileName, "wb")) == NULL) {
+		
+				perror("An error occurred while trying to file for writing");
+				
+				return 1;
+				
+			}
+			
+			/* add exam result */
+			
 			puts("Enter student last name:");
 			
 			char studentLastName[MAX_STUDENT_LAST_NAME_LENGTH];
@@ -167,9 +168,32 @@ int fileViewMenu(FILE *file) {
 			puts("Enter the mark for informatics:");
 			while (!markValid(student.marks[2] = readMark())) puts("Invalid mark entered, try again:");
 			
-			toZString(studentLastName, student.name);
+			toZString(studentLastName, &student.name);
+			
+			long int studentCount = 0;
+			fread(&studentCount, sizeof(long int), 1, file);
+			
+			fseek(file, 0, SEEK_SET);
+			
+			writeInt(file, studentCount + 1);
+			
+			fseek(file, sizeof(long int) + (studentCount * STUDENT_COMPONENT_LENGTH), SEEK_SET);
+			
+			writeStudent(file, &student);
+			
+			/* fseek(file, 0, SEEK_SET); */
+			
+			fclose(file);
+			
+			puts("Data added.");
 			
 			return 1;
+			
+		case 7:
+			
+			fclose(file);
+		
+			return 0;
 		
 		default:
 			
@@ -199,6 +223,16 @@ unsigned char readMark() {
 	
 }
 
+void writeStudent(FILE *file, struct Student *student) {
+	
+	writeZString(file, &student->name);
+	
+	fputc(student->marks[0], file);
+	fputc(student->marks[1], file);
+	fputc(student->marks[2], file);
+	
+}
+
 void writeZString(FILE *file, struct ZString *str) {
 	
 	fwrite(&str->length, sizeof(long int), 1, file);
@@ -209,8 +243,30 @@ void writeZString(FILE *file, struct ZString *str) {
 
 void toZString(char* str, struct ZString *zString) {
 	
-	zString->length = (unsigned long int)strlen(str) - 1;
+	zString->length = (unsigned long int)strlen(str);
 	
 	zString->str = str;
 	
 }
+
+void writeInt(FILE *file, long int value) {
+	
+	fwrite(&value, sizeof(long int), 1, file);
+	/*unsigned long int uvalue = (unsigned long int)value;
+	
+	fputc((uvalue >> 24) & 0xff, file);
+	fputc((uvalue >> 16) & 0xff, file);
+	fputc((uvalue >> 8) & 0xff, file);
+	fputc(uvalue & 0xff, file);*/
+	
+}
+
+/*long int readInt(FILE *file, long int *destination) {
+	
+	unsigned char buffer[sizeof(long int)];
+	
+	fread(buffer, sizeof(char), sizeof(long int), file);
+	
+	
+	
+}*/
