@@ -129,7 +129,7 @@ int fileViewMenu(char *fileName) {
 	puts("3 - delete an exam result.");
 	puts("4 - edit an exam result.");
 	puts("5 - get the amount of 2-s for every discipline.");
-	puts("6 - get students, that have 2-s for in least 1 exam.");
+	puts("6 - get students, that have 2-s for at least 1 exam.");
 	puts("7 - return to the main menu.");
 	
 	int result;
@@ -139,11 +139,18 @@ int fileViewMenu(char *fileName) {
 	
 	switch (result) {
 		
+		case 1:
+			
+			/* view file */
+			/* TODO: call viewFileMenu(fileName) */
+			
+			break;
+		
 		case 2:
 			
 			if ((file = fopen(fileName, "wb")) == NULL) {
 		
-				perror("An error occurred while trying to file for writing");
+				perror("An error occurred while trying to open the file for writing");
 				
 				return 1;
 				
@@ -181,29 +188,38 @@ int fileViewMenu(char *fileName) {
 			
 			writeStudent(file, &student);
 			
-			/* fseek(file, 0, SEEK_SET); */
-			
 			fclose(file);
 			
 			puts("Data added.");
 			
-			return 1;
+			break;
 			
-		case 7:
+		case 3:
+			/* delete an exam result */
 			
-			fclose(file);
+			if ((file = fopen(fileName, "wb")) == NULL) {
 		
-			return 0;
+				perror("An error occurred while trying to open the file for writing");
+				
+				return 1;
+				
+			}
+			
+			/* TODO */
+			
+			break;
+			
+		case 7: return 0;
 		
 		default:
 			
 			puts("Invalid menu item selected, try again.");
 			
-			return 1;
+			break;
 		
 	}
 	
-	return 0;
+	return 1;
 	
 }
 
