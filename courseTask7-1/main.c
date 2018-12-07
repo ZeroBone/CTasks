@@ -5,7 +5,11 @@
 #include <windows.h>
 #define MAX_FNAME_LENGTH 50
 
-char phraseOk(char*);
+void fprintFragment(FILE *file, int count);
+char isEndOfWord(int c);
+char isEndOfPhrase(int c);
+char freadInt(FILE* file, int *destination);
+char freadNumber(FILE *file, int *destination);
 
 int main(int argc, char *argv[]) {
 	
@@ -33,9 +37,9 @@ int main(int argc, char *argv[]) {
 	printf("Input file: ");
 	puts(inputFileName);
 	
-	FILE *inputFile, *tempFile;
+	FILE *file, *tempFile;
 	
-	if ((inputFile = fopen(inputFileName, "r")) == NULL) {
+	if ((file = fopen(inputFileName, "r")) == NULL) {
 		
 		perror("An error occurred while trying to read the file");
 		
@@ -55,80 +59,102 @@ int main(int argc, char *argv[]) {
 		
 	}
 	
-	int currentSymbol, phraseStartPosition, currentPosition, phraseLength;
-	char *phrase;
-	/* int temp; */
+	int phraseStart = 0, phraseEnd = 0;
+	char hasNumbers = 0, numberAfterSpace = 0;
+	int current, temp;
+	char starting = 1, ending[3] = {'?', '?'};
 	
-	phraseStartPosition = 0; /* ftell(inputFile); */
-	
-	/* fscanf(inputFile, "%d", &cur) != EOF */
 	while (1) {
 		
-		currentSymbol = fgetc(inputFile);
+		current = fgetc(file);
 		
-		if (currentSymbol == ' ') continue;
+		printf("   Current: %c\n", current);
 		
-		if (currentSymbol == '.' || currentSymbol == EOF) {
+		if (isEndOfPhrase(current)) { /* current == '.' || current == EOF */
 			
-			/* current pharase has ended */
+			phraseEnd = ftell(file);
 			
-			currentPosition = ftell(inputFile);
+			printf("End of phrase reached: %d\n", phraseEnd);
 			
-			fseek(inputFile, phraseStartPosition, SEEK_SET);
-			
-			phraseLength = currentPosition - phraseStartPosition;
-			
-			phrase = (char*)malloc(phraseLength * sizeof(char) + sizeof(char)); /* +1 for null-terminator */
-			
-			if (phrase == NULL) {
+			phraseStart = phraseEnd;
 				
-				perror("Could not allocate enouph memory for the phrase");
-		
-				system("pause");
+			if (hasNumbers) {
 				
-				return 3;
+				puts("PHRASE HAS NUMBERS:");
+				
+				/*fseek(file, phraseStart, SEEK_SET);
+				
+				fprintFragment(file, phraseEnd - phraseStart); */
+				
+				
+				
+			}
+			else {
+				
+				printf("Hasn't got numbers, cur char: %c\n", current);
 				
 			}
 			
-			phrase[phraseLength] = '\0';
+			if (current == EOF) break;
 			
-			fread(phrase, sizeof(char), phraseLength, inputFile);
+			hasNumbers = 0;
+			starting = 1;
 			
-			printf("Current phrase (%d): ", phrase[0]);
-			puts(phrase);
+		}
+		else if (starting || (!hasNumbers && isEndOfWord(current))) {
 			
-			if (phraseOk(phrase)) {
+			if (starting) {
 				
-				fwrite(phrase, sizeof(char), phraseLength, tempFile);
+				fseek(file, -1, SEEK_CUR);
+				
+				starting = 0;
 				
 			}
 			
-			free(phrase);
+			/* end of word, probably start of the new one */
 			
-			if (currentSymbol == EOF) break;
-			
-			fseek(inputFile, currentPosition, SEEK_SET);
-			
-			phraseStartPosition = currentPosition;
-			
-			/*do {
+			if (freadInt(file, &temp)) {
 				
-				temp = fgetc(inputFile);
+				current = fgetc(file);
 				
-				currentPosition++;
+				printf("Int read: %d Current char: %c\n", temp, current);
 				
-			} while (temp != '\n' && temp != EOF);
-			
-			phraseStartPosition = currentPosition + 1;
-			
-			fseek(inputFile, phraseStartPosition, SEEK_SET);*/
-			
+				if (isEndOfWord(current)) {
+					
+					/* fseek(file, -1, SEEK_CUR); */
+					
+					hasNumbers = 1;
+					
+				}
+				else if (isEndOfPhrase(current)) {
+					
+					hasNumbers = 1;
+					
+					fseek(file, -1, SEEK_CUR);
+					
+				}
+				else {
+					
+					fseek(file, -1, SEEK_CUR);
+					
+					temp = fread(ending, sizeof(char), 2, file);
+					
+					printf("READ %d BYTES ASSUMING -\n", temp);
+					puts(ending);
+					
+					fseek(file, -1, SEEK_CUR);
+					
+					if (temp == 2 && strcmp(ending, "-é") == 0) hasNumbers = 1;
+					
+				}
+				
+			}
 			
 		}
 		
 	}
 	
-	fclose(inputFile);
+	fclose(file);
 	fclose(tempFile);
 	
 	/* unlink(inputFileName);
@@ -140,25 +166,71 @@ int main(int argc, char *argv[]) {
 	
 }
 
-char phraseOk(char* phrase) {
+void fprintFragment(FILE *file, int count) {
 	
-	int d;
-	
-	if (sscanf(phrase, "%d.", &d) || sscanf(phrase, "%d-é.", &d) || sscanf(phrase, "%d ", &d) || sscanf(phrase, "%d-é ", &d)) return 1;
-	
-	while (*phrase != '\0') {
+	for (; count > 0; count--) {
 		
-		if (*phrase == ' ' || *phrase == '\n') {
-			
-			phrase++;
-			
-			if (sscanf(phrase, "%d.", &d) || sscanf(phrase, "%d-é.", &d) || sscanf(phrase, "%d ", &d) || sscanf(phrase, "%d-é ", &d)) return 1;
-			
-		}
-		else phrase++;
+		fputc(fgetc(file), stdout);
 		
 	}
 	
-	return 0;
+}
+
+char isEndOfWord(int c) {
+	
+	return c == ' ' || c == ',' || c == '\n';
 	
 }
+
+char isEndOfPhrase(int c) {
+	
+	return c == '.' || c == EOF;
+	
+}
+
+char freadInt(FILE* file, int *destination) {
+	
+	int current = fgetc(file);
+	
+	if (current == EOF) return 0;
+	
+	if (current == '+') return freadNumber(file, destination);
+	
+	if (current == '-') {
+		
+		char res = freadNumber(file, destination);
+		
+		*destination = -*destination;
+		
+		return res;
+		
+	}
+	
+	fseek(file, -1, SEEK_CUR);
+	
+	return freadNumber(file, destination);
+	
+}
+
+char freadNumber(FILE *file, int *destination) {
+	
+	int current = fgetc(file);
+	
+	if (current == EOF || current < '0' || current > '9') return 0;
+	
+	int result = 0;
+	
+	do {
+		
+		result = (result * 10) + (current - '0');
+		
+	} while ((current = fgetc(file)), current != EOF && current >= '0' && current <= '9');
+	
+	*destination = result;
+	
+	fseek(file, -1, SEEK_CUR);
+	
+	return 1;
+	
+}
+
