@@ -74,19 +74,21 @@ int main(int argc, char *argv[]) {
 			
 			phraseEnd = ftell(file);
 			
-			printf("End of phrase reached: %d\n", phraseEnd);
+			printf("End of phrase started: %d Reached: %d\n", phraseStart, phraseEnd);
 			
-			phraseStart = phraseEnd;
+			printf("DEBUG: %d\n", ftell(file));
+			
+			fseek(file, phraseStart, SEEK_SET);
+				
+			fprintFragment(file, phraseEnd - phraseStart);
+			
+			printf("DEBUG A: %d\n", ftell(file));
+			
+			phraseStart = phraseEnd + 1;
 				
 			if (hasNumbers) {
 				
 				puts("PHRASE HAS NUMBERS:");
-				
-				/*fseek(file, phraseStart, SEEK_SET);
-				
-				fprintFragment(file, phraseEnd - phraseStart); */
-				
-				
 				
 			}
 			else {
@@ -139,7 +141,7 @@ int main(int argc, char *argv[]) {
 					
 					temp = fread(ending, sizeof(char), 2, file);
 					
-					printf("READ %d BYTES ASSUMING -\n", temp);
+					/* printf("READ %d BYTES ASSUMING -\n", temp); */
 					puts(ending);
 					
 					fseek(file, -1, SEEK_CUR);
