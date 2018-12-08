@@ -64,13 +64,9 @@ int main(int argc, char *argv[]) {
 
 			currentPosition = ftell(file);
 			
-			/*fseek(file, -1, SEEK_CUR);*/
+			/*printf("Current: %d As char: %c\n", current, current);
 			
-			/*if (currentPosition > 257) break;*/
-			
-			printf("Current: %d As char: %c\n", current, current);
-			
-			printf("CURRENT POSITION: %d\n", currentPosition);
+			printf("CURRENT POSITION: %d\n", currentPosition);*/
 			
 			if (hasNumbers) puts("PHRASE WITH NUMBER(S):");
 			else puts("PHRASE WITHOUT ANY NUMBER:");
@@ -112,8 +108,6 @@ int main(int argc, char *argv[]) {
 		}
 		else if (hasNumbers) {
 			
-			printf("b3\n");
-			
 			/* skip everything */
 			
 			do {
@@ -122,29 +116,19 @@ int main(int argc, char *argv[]) {
 				
 			} while (!isEndOfPhrase(current));
 			
-			/*fseek(file, -1, SEEK_CUR);*/
-			
 			phraseEnded = 1;
 			
 			continue;
 			
 		}
 		
-		int _ = ftell(file);
-		
-		/* printf("BEFORE POS: %d\n", _); */
-		
 		if (wordBegan && freadInt(file, &temp)) {
-			
-			printf("b9\n");
 			
 			current = fgetc(file);
 			
 			printf("Detected number %d before %c\n", temp, current);
 		
 			if (isEndOfPhrase(current)) {
-				
-				printf("b1\n");
 				
 				phraseEnded = 1;
 			
@@ -155,8 +139,6 @@ int main(int argc, char *argv[]) {
 			}
 			
 			if (isEndOfWord(current)) {
-				
-				printf("b2\n");
 				
 				hasNumbers = 1;
 				
@@ -173,23 +155,11 @@ int main(int argc, char *argv[]) {
 			
 			if (temp == '-' && current == 233) { /* 233 is the code of the russian letter */
 				
-				printf("b4\n");
-				
 				hasNumbers = 1;
 				
 				continue;
 				
 			}
-			
-		}
-		
-		int _af = ftell(file);
-		
-		if (_af < _) {
-			
-			printf("!!!BUG!!! AFTER POS: %d\n", _af);
-			
-			break;
 			
 		}
 		
@@ -202,8 +172,6 @@ int main(int argc, char *argv[]) {
 		if (isEndOfPhrase(current)) {
 			
 			phraseEnded = 1;
-			
-			printf("b7\n");
 			
 			/*current = fgetc(file);*/
 			
