@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
 		
 		/* printf("BEFORE POS: %d\n", _); */
 		
-		if (0 && wordBegan && freadInt(file, &temp)) {
+		if (wordBegan && freadInt(file, &temp)) {
 			
 			printf("b9\n");
 			
