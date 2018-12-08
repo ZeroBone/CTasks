@@ -42,9 +42,7 @@ int main(int argc, char *argv[]) {
 	if ((file = fopen(inputFileName, "r")) == NULL) {
 		
 		perror("An error occurred while trying to read the file");
-		
 		system("pause");
-		
 		return 1;
 		
 	}
@@ -52,9 +50,7 @@ int main(int argc, char *argv[]) {
 	if ((tempFile = fopen("temp.txt", "w")) == NULL) {
 		
 		perror("An error occurred while trying to create a temp file");
-		
 		system("pause");
-		
 		return 2;
 		
 	}
@@ -72,20 +68,45 @@ int main(int argc, char *argv[]) {
 			
 			/*if (currentPosition > 257) break;*/
 			
+			printf("Current: %d As char: %c\n", current, current);
+			
 			printf("CURRENT POSITION: %d\n", currentPosition);
 			
 			fseek(file, phraseStart, SEEK_SET);
 			
 			if (hasNumbers) puts("PHRASE WITH NUMBER(S):");
 			else puts("PHRASE WITHOUT ANY NUMBER:");
-			fprintFragment(file, currentPosition - phraseStart);
+			
+			do {
+				
+				temp = fgetc(file);
+				
+				if (temp != EOF) {
+					
+					fputc(temp, tempFile);
+				
+					printf("%c", temp);
+					
+				}
+				
+			} while (temp != EOF && ftell(file) < currentPosition);
+			
 			printf("\n");
+			/*int i;
+			for (i = 0; i < currentPosition - phraseStart; i++) {
+				
+				fputc(fgetc(file), tempFile);
+				
+			}*/
 			
 			fseek(file, currentPosition, SEEK_SET);
 			
-			printf("Current: %d As char: %c\n", current, current);
+			
 			
 			if (current == EOF) break;
+			
+			printf("Next: '%c'\n", fgetc(file));
+			fseek(file, currentPosition, SEEK_SET);
 			
 			/* reset */
 			
@@ -107,7 +128,7 @@ int main(int argc, char *argv[]) {
 				
 			} while (!isEndOfPhrase(current));
 			
-			/*fseek(file, -1, SEEK_CUR);*/
+			fseek(file, -1, SEEK_CUR);
 			
 			phraseEnded = 1;
 			
@@ -119,7 +140,7 @@ int main(int argc, char *argv[]) {
 		
 		/* printf("BEFORE POS: %d\n", _); */
 		
-		if (wordBegan && freadInt(file, &temp)) {
+		if (0 && wordBegan && freadInt(file, &temp)) {
 			
 			printf("b9\n");
 			
@@ -152,6 +173,8 @@ int main(int argc, char *argv[]) {
 				
 			}
 			
+			/* fseek(file, _, SEEK_SET); */
+			
 		}
 		
 		int _af = ftell(file);
@@ -176,7 +199,7 @@ int main(int argc, char *argv[]) {
 			
 			printf("b7\n");
 			
-			/*fseek(file, 1, SEEK_CUR);*/
+			/*current = fgetc(file);*/
 			
 			continue;
 			
