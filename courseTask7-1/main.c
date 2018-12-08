@@ -11,6 +11,8 @@ char isEndOfPhrase(int c);
 char freadInt(FILE* file, int *destination);
 char freadNumber(FILE *file, int *destination);
 
+const char *tempFileName = "temp.txt";
+
 int main(int argc, char *argv[]) {
 	
 	setlocale(LC_ALL, "Russian");
@@ -47,7 +49,7 @@ int main(int argc, char *argv[]) {
 		
 	}
 	
-	if ((tempFile = fopen("temp.txt", "w")) == NULL) {
+	if ((tempFile = fopen(tempFileName, "w")) == NULL) {
 		
 		perror("An error occurred while trying to create a temp file");
 		system("pause");
@@ -190,8 +192,8 @@ int main(int argc, char *argv[]) {
 	fclose(file);
 	fclose(tempFile);
 	
-	/* unlink(inputFileName);
-	rename("temp.txt", inputFileName); */
+	unlink(inputFileName);
+	rename(tempFileName, inputFileName);
 	
 	system("pause");
 	
