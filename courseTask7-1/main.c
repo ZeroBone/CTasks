@@ -72,10 +72,10 @@ int main(int argc, char *argv[]) {
 			
 			printf("CURRENT POSITION: %d\n", currentPosition);
 			
-			fseek(file, phraseStart, SEEK_SET);
-			
 			if (hasNumbers) puts("PHRASE WITH NUMBER(S):");
 			else puts("PHRASE WITHOUT ANY NUMBER:");
+			
+			fseek(file, phraseStart, SEEK_SET);
 			
 			do {
 				
@@ -83,13 +83,15 @@ int main(int argc, char *argv[]) {
 				
 				if (temp != EOF) {
 					
-					fputc(temp, tempFile);
+					if (hasNumbers) fputc(temp, tempFile);
 				
 					printf("%c", temp);
 					
 				}
 				
 			} while (temp != EOF && ftell(file) < currentPosition);
+			
+			/*fputc('|', tempFile);*/
 			
 			printf("\n");
 			/*int i;
@@ -101,12 +103,10 @@ int main(int argc, char *argv[]) {
 			
 			fseek(file, currentPosition, SEEK_SET);
 			
-			
-			
 			if (current == EOF) break;
 			
-			printf("Next: '%c'\n", fgetc(file));
-			fseek(file, currentPosition, SEEK_SET);
+			/*printf("Next: '%c'\n", fgetc(file));
+			fseek(file, currentPosition, SEEK_SET);*/
 			
 			/* reset */
 			
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 				
 			} while (!isEndOfPhrase(current));
 			
-			fseek(file, -1, SEEK_CUR);
+			/*fseek(file, -1, SEEK_CUR);*/
 			
 			phraseEnded = 1;
 			
