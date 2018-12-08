@@ -26,8 +26,6 @@ void writeZString(FILE *file, struct ZString *str);
 void toZString(char* str, struct ZString *zString);
 void writeInt(FILE *file, long int value);
 
-
-
 int main(int argc, char *argv[]) {
 	
 	setlocale(LC_ALL, "Russian");
@@ -142,6 +140,31 @@ int fileViewMenu(char *fileName) {
 		case 1:
 			
 			/* view file */
+			
+			if ((file = fopen(fileName, "rb")) == NULL) {
+		
+				perror("An error occurred while trying to open the file for reading");
+				
+				return 1;
+				
+			}
+			
+			long int count;
+			
+			fseek(file, 0, SEEK_SET);
+			
+			fread(&count, sizeof(long int), 1, file);
+			
+			long int offset = 0, i;
+			
+			while (1) {
+				
+				fseek(file, 4 + (offset * STUDENT_COMPONENT_LENGTH), SEEK_SET);
+				
+				for (i = 0; i < 5; i++);
+				
+			}
+			
 			/* TODO: call viewFileMenu(fileName) */
 			
 			break;
@@ -249,6 +272,41 @@ void writeStudent(FILE *file, struct Student *student) {
 	
 }
 
+struct Student *readStudent(FILE *file) {
+	
+	
+	
+}
+
+struct ZString readZString(FILE *file, unsigned long int maxLength) {
+	
+	struct ZString zString;
+	
+	fread(&zString.length, sizeof(long int), 1, file);
+	
+	unsigned long int i, len = zString.length > maxLength ? maxLength : zString.length;
+	char str[len + 1];
+	int temp;
+	
+	for (i = 0; i < len; i++) {
+		
+		temp = fgetc(file);
+		
+		if (temp == EOF) {
+			
+			str[i] = '\0';
+			break;
+			
+		}
+		
+		str[i] = temp;
+		
+	}
+	
+	str[len] = '\0';
+	
+}
+
 void writeZString(FILE *file, struct ZString *str) {
 	
 	fwrite(&str->length, sizeof(long int), 1, file);
@@ -276,13 +334,3 @@ void writeInt(FILE *file, long int value) {
 	fputc(uvalue & 0xff, file);*/
 	
 }
-
-/*long int readInt(FILE *file, long int *destination) {
-	
-	unsigned char buffer[sizeof(long int)];
-	
-	fread(buffer, sizeof(char), sizeof(long int), file);
-	
-	
-	
-}*/
