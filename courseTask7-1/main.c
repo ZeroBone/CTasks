@@ -59,98 +59,134 @@ int main(int argc, char *argv[]) {
 		
 	}
 	
-	int phraseStart = 0, phraseEnd = 0;
-	char hasNumbers = 0, numberAfterSpace = 0;
-	int current, temp;
-	char starting = 1, ending[3] = {'?', '?'};
+	int current, temp, phraseStart = 0, currentPosition;
+	char hasNumbers = 0, wordBegan = 1, phraseEnded = 0;
 	
 	while (1) {
 		
-		current = fgetc(file);
-		
-		printf("   Current: %c\n", current);
-		
-		if (isEndOfPhrase(current)) { /* current == '.' || current == EOF */
+		if (phraseEnded) {
+
+			currentPosition = ftell(file);
 			
-			phraseEnd = ftell(file);
+			/*fseek(file, -1, SEEK_CUR);*/
 			
-			printf("End of phrase started: %d Reached: %d\n", phraseStart, phraseEnd);
+			/*if (currentPosition > 257) break;*/
 			
-			printf("DEBUG: %d\n", ftell(file));
+			printf("CURRENT POSITION: %d\n", currentPosition);
 			
 			fseek(file, phraseStart, SEEK_SET);
-				
-			fprintFragment(file, phraseEnd - phraseStart);
 			
-			printf("DEBUG A: %d\n", ftell(file));
+			if (hasNumbers) puts("PHRASE WITH NUMBER(S):");
+			else puts("PHRASE WITHOUT ANY NUMBER:");
+			fprintFragment(file, currentPosition - phraseStart);
+			printf("\n");
 			
-			phraseStart = phraseEnd + 1;
-				
-			if (hasNumbers) {
-				
-				puts("PHRASE HAS NUMBERS:");
-				
-			}
-			else {
-				
-				printf("Hasn't got numbers, cur char: %c\n", current);
-				
-			}
+			fseek(file, currentPosition, SEEK_SET);
+			
+			printf("Current: %d As char: %c\n", current, current);
 			
 			if (current == EOF) break;
 			
+			/* reset */
+			
+			phraseEnded = 0;
 			hasNumbers = 0;
-			starting = 1;
+			phraseStart = currentPosition;
+			wordBegan = 1;
 			
 		}
-		else if (starting || (!hasNumbers && isEndOfWord(current))) {
+		else if (hasNumbers) {
 			
-			if (starting) {
-				
-				fseek(file, -1, SEEK_CUR);
-				
-				starting = 0;
-				
-			}
+			printf("b3\n");
 			
-			/* end of word, probably start of the new one */
+			/* skip everything */
 			
-			if (freadInt(file, &temp)) {
+			do {
 				
 				current = fgetc(file);
 				
-				printf("Int read: %d Current char: %c\n", temp, current);
+			} while (!isEndOfPhrase(current));
+			
+			/*fseek(file, -1, SEEK_CUR);*/
+			
+			phraseEnded = 1;
+			
+			continue;
+			
+		}
+		
+		int _ = ftell(file);
+		
+		/* printf("BEFORE POS: %d\n", _); */
+		
+		if (wordBegan && freadInt(file, &temp)) {
+			
+			printf("b9\n");
+			
+			current = fgetc(file);
+			
+			printf("Detected number %d before %c\n", temp, current);
+		
+			if (isEndOfPhrase(current)) {
 				
-				if (isEndOfWord(current)) {
-					
-					/* fseek(file, -1, SEEK_CUR); */
-					
-					hasNumbers = 1;
-					
-				}
-				else if (isEndOfPhrase(current)) {
-					
-					hasNumbers = 1;
-					
-					fseek(file, -1, SEEK_CUR);
-					
-				}
-				else {
-					
-					fseek(file, -1, SEEK_CUR);
-					
-					temp = fread(ending, sizeof(char), 2, file);
-					
-					/* printf("READ %d BYTES ASSUMING -\n", temp); */
-					puts(ending);
-					
-					fseek(file, -1, SEEK_CUR);
-					
-					if (temp == 2 && strcmp(ending, "-é") == 0) hasNumbers = 1;
-					
-				}
+				printf("b1\n");
+				
+				phraseEnded = 1;
+			
+				hasNumbers = 1;
+				
+				continue;
 				
 			}
+			
+			if (isEndOfWord(current)) {
+				
+				printf("b2\n");
+				
+				hasNumbers = 1;
+				
+				/*wordBegan = 1;*/
+				/*fseek(file, -1, SEEK_CUR);*/
+				
+				continue;
+				
+			}
+			
+		}
+		
+		int _af = ftell(file);
+		
+		if (_af < _) {
+			
+			printf("!!!BUG!!! AFTER POS: %d\n", _af);
+			
+			break;
+			
+		}
+		
+		wordBegan = 0;
+		
+		current = fgetc(file);
+		
+		/*printf("Read %d (%c) Position: %d Feof: %d\n", current, current, ftell(file), feof(file));*/
+		
+		if (isEndOfPhrase(current)) {
+			
+			phraseEnded = 1;
+			
+			printf("b7\n");
+			
+			/*fseek(file, 1, SEEK_CUR);*/
+			
+			continue;
+			
+		}
+		
+		if (isEndOfWord(current)) {
+			
+			/*printf("Word began\n");*/
+			
+			wordBegan = 1;
 			
 		}
 		
@@ -170,11 +206,15 @@ int main(int argc, char *argv[]) {
 
 void fprintFragment(FILE *file, int count) {
 	
-	for (; count > 0; count--) {
+	int i;
+	
+	for (i = 0; i < count; i++) {
 		
 		fputc(fgetc(file), stdout);
 		
 	}
+	
+	fseek(file, -count, SEEK_CUR);
 	
 }
 
@@ -194,17 +234,41 @@ char freadInt(FILE* file, int *destination) {
 	
 	int current = fgetc(file);
 	
-	if (current == EOF) return 0;
+	if (current == EOF) {
+		
+		/*fseek(file, -1, SEEK_CUR);*/ /* this was the problem */
+		
+		return 0;
 	
-	if (current == '+') return freadNumber(file, destination);
+	}
+	
+	if (current == '+') {
+		
+		if (!freadNumber(file, destination)) {
+			
+			fseek(file, -1, SEEK_CUR);
+			
+			return 0;
+			
+		}
+		
+		return 1;
+		
+	}
 	
 	if (current == '-') {
 		
-		char res = freadNumber(file, destination);
+		if (!freadNumber(file, destination)) {
+			
+			fseek(file, -1, SEEK_CUR);
+			
+			return 0;
+			
+		}
 		
 		*destination = -*destination;
 		
-		return res;
+		return 1;
 		
 	}
 	
@@ -218,7 +282,13 @@ char freadNumber(FILE *file, int *destination) {
 	
 	int current = fgetc(file);
 	
-	if (current == EOF || current < '0' || current > '9') return 0;
+	if (current == EOF || current < '0' || current > '9') {
+	
+		fseek(file, -1, SEEK_CUR);
+	
+		return 0;
+	
+	}
 	
 	int result = 0;
 	
