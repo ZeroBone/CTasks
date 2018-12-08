@@ -91,15 +91,9 @@ int main(int argc, char *argv[]) {
 				
 			} while (temp != EOF && ftell(file) < currentPosition);
 			
-			/*fputc('|', tempFile);*/
+			/* fputc('|', tempFile); */
 			
 			printf("\n");
-			/*int i;
-			for (i = 0; i < currentPosition - phraseStart; i++) {
-				
-				fputc(fgetc(file), tempFile);
-				
-			}*/
 			
 			fseek(file, currentPosition, SEEK_SET);
 			
@@ -167,13 +161,25 @@ int main(int argc, char *argv[]) {
 				hasNumbers = 1;
 				
 				/*wordBegan = 1;*/
-				/*fseek(file, -1, SEEK_CUR);*/
 				
 				continue;
 				
 			}
 			
-			/* fseek(file, _, SEEK_SET); */
+			temp = current;
+			current = fgetc(file);
+			
+			/* printf("SEQUENCE %c%c DIGITS: %d %d\n", temp, current, temp, current); */
+			
+			if (temp == '-' && current == 233) { /* 233 is the code of the russian letter */
+				
+				printf("b4\n");
+				
+				hasNumbers = 1;
+				
+				continue;
+				
+			}
 			
 		}
 		
@@ -206,8 +212,6 @@ int main(int argc, char *argv[]) {
 		}
 		
 		if (isEndOfWord(current)) {
-			
-			/*printf("Word began\n");*/
 			
 			wordBegan = 1;
 			
