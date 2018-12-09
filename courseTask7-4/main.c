@@ -6,6 +6,7 @@
 #define MAX_FNAME_LENGTH 50
 #define MAX_STUDENT_LAST_NAME_LENGTH 20
 #define STUDENT_COMPONENT_LENGTH 27
+#define STUDENTS_PER_PAGE 5
 
 struct ZString {
 	unsigned long int length;
@@ -22,9 +23,11 @@ unsigned char readMark();
 char markValid(unsigned char mark);
 int fileViewMenu(char *fileName);
 void writeStudent(FILE *file, struct Student *student);
+struct Student *readStudent(FILE *file);
 void writeZString(FILE *file, struct ZString *str);
 void toZString(char* str, struct ZString *zString);
 void writeInt(FILE *file, long int value);
+struct ZString *readZString(FILE *file, unsigned long int maxLength);
 
 int main(int argc, char *argv[]) {
 	
@@ -149,21 +152,66 @@ int fileViewMenu(char *fileName) {
 				
 			}
 			
-			long int count;
+			long int totalCount;
 			
 			fseek(file, 0, SEEK_SET);
 			
-			fread(&count, sizeof(long int), 1, file);
+			fread(&totalCount, sizeof(long int), 1, file);
+			
+			if (!totalCount) {
+				
+				puts("File empty, nothing to view.");
+				
+				break;
+				
+			}
 			
 			long int offset = 0, i;
+			long int studentsPerPage = STUDENTS_PER_PAGE > totalCount ? totalCount : STUDENTS_PER_PAGE;
+			int choise;
+			struct Student *stud;
 			
 			while (1) {
 				
-				fseek(file, 4 + (offset * STUDENT_COMPONENT_LENGTH), SEEK_SET);
+				for (i = 0; i < 5; i++) {
+					
+					fseek(file, sizeof(long int) + (offset * STUDENT_COMPONENT_LENGTH), SEEK_SET);
+					
+					stud = readStudent(file);
+					
+				}
 				
-				for (i = 0; i < 5; i++);
+				puts("Which direction do you want to scroll to?");
+				puts("1 - scroll up.");
+				puts("2 - scroll down.");
+				puts("3 - exit.");
+				
+				scanf("%d", &choise);
+				
+				switch (choise) {
+					
+					case 1:
+						/* scroll up */
+						
+						offset -= 5;
+						if (offset < 0) offset = 0;
+						
+						break;
+						
+					case 2:
+						/* scroll down */
+						offset += 5;
+						if (offset > totalCount - 5) offset = totalCount - 5;
+						
+						break;
+					
+					default:
+						goto exitMark;
+					
+				}
 				
 			}
+			exitMark:
 			
 			/* TODO: call viewFileMenu(fileName) */
 			
@@ -213,7 +261,7 @@ int fileViewMenu(char *fileName) {
 			
 			fclose(file);
 			
-			puts("Data added.");
+			puts("Exam result added.");
 			
 			break;
 			
@@ -264,21 +312,29 @@ unsigned char readMark() {
 
 void writeStudent(FILE *file, struct Student *student) {
 	
-	writeZString(file, &student->name);
-	
 	fputc(student->marks[0], file);
 	fputc(student->marks[1], file);
 	fputc(student->marks[2], file);
+	
+	writeZString(file, &student->name);
 	
 }
 
 struct Student *readStudent(FILE *file) {
 	
+	struct Student student;
 	
+	student.marks[0] = fgetc(file);
+	student.marks[1] = fgetc(file);
+	student.marks[2] = fgetc(file);
+	
+	readZString(file, 20);
+	
+	return &student;
 	
 }
 
-struct ZString readZString(FILE *file, unsigned long int maxLength) {
+struct ZString *readZString(FILE *file, unsigned long int maxLength) {
 	
 	struct ZString zString;
 	
@@ -304,6 +360,10 @@ struct ZString readZString(FILE *file, unsigned long int maxLength) {
 	}
 	
 	str[len] = '\0';
+	
+	zString.str = str;
+	
+	return &zString;
 	
 }
 
