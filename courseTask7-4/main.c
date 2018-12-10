@@ -11,13 +11,13 @@
 #define MARK_TWO 2
 
 struct Student {
-	unsigned char marks[3];
+	char marks[3];
 	char name[MAX_STUDENT_LAST_NAME_LENGTH];
 };
 
 int mainMenu();
-unsigned char readMark();
-char markValid(unsigned char mark);
+char readMark();
+char markValid(char mark);
 int fileViewMenu(char *fileName);
 void writeStudent(FILE *file, struct Student *student);
 char readStudent(FILE *file, struct Student *student);
@@ -52,7 +52,8 @@ int mainMenu() {
 	int result;
 	
 	scanf("%d", &result);
-	fgetc(stdin);
+	
+	getchar();
 	
 	switch (result) {
 		
@@ -150,7 +151,7 @@ int fileViewMenu(char *fileName) {
 	int result;
 	
 	scanf("%d", &result);
-	fgetc(stdin);
+	getchar();
 	
 	switch (result) {
 		
@@ -158,7 +159,7 @@ int fileViewMenu(char *fileName) {
 			
 			/* view file */
 			
-			if ((file = fopen(fileName, "r+b")) == NULL) {
+			if ((file = fopen(fileName, "rb")) == NULL) {
 				
 				system("CLS");
 		
@@ -178,7 +179,7 @@ int fileViewMenu(char *fileName) {
 				
 				system("CLS");
 				
-				fseek(file, (offset) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+				fseek(file, offset * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 				
 				if (!readStudent(file, stud)) {
 					
@@ -190,6 +191,7 @@ int fileViewMenu(char *fileName) {
 					
 				}
 				
+				puts("--------------------------------------");
 				puts("|  N|        Name        | P | M | I |");
 				puts("--------------------------------------");
 				
@@ -198,6 +200,8 @@ int fileViewMenu(char *fileName) {
 					fseek(file, (offset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 					
 					if (!readStudent(file, stud)) {
+						
+						fseek(file, 0, SEEK_SET);
 					
 						break;
 						
@@ -219,12 +223,16 @@ int fileViewMenu(char *fileName) {
 					
 				}
 				
+				puts("--------------------------------------");
+				
 				puts("Which direction do you want to scroll to?");
 				puts("1 - scroll up.");
 				puts("2 - scroll down.");
 				puts("3 - exit.");
 				
 				scanf("%d", &choise);
+				
+				getchar();
 				
 				switch (choise) {
 					
@@ -293,10 +301,9 @@ int fileViewMenu(char *fileName) {
 			
 			/*fseek(file, 0, SEEK_SET);*/
 			
-			fseek(file, 0, SEEK_END);
-			long int fileLength = ftell(file);
+			fseek(file, -1, SEEK_END);
 			
-			fseek(file, fileLength, SEEK_SET);
+			printf("Writing to %d\n", ftell(file));
 			
 			writeStudent(file, &student);
 			
@@ -321,6 +328,8 @@ int fileViewMenu(char *fileName) {
 			
 			/* TODO */
 			
+			fclose(file);
+			
 			break;
 			
 		case 7:
@@ -343,19 +352,19 @@ int fileViewMenu(char *fileName) {
 	
 }
 
-char markValid(unsigned char mark) {
+char markValid(char mark) {
 	
 	return mark >= MARK_MIN && mark <= MARK_MAX;
 	
 }
 
-unsigned char readMark() {
+char readMark() {
 	
 	int temp;
 	
 	scanf("%d", &temp);
 	
-	return (unsigned char)temp;
+	return temp;
 	
 }
 
@@ -383,7 +392,7 @@ char readStudent(FILE *file, struct Student *student) {
 	
 	int current, i;
 	
-	printf("CUROS: %d\n", ftell(file));
+	/*printf("CUROS: %d\n", ftell(file));*/
 	
 	for (i = 0; i < 3; i++) {
 		
@@ -395,11 +404,11 @@ char readStudent(FILE *file, struct Student *student) {
 			
 		}
 		
-		student->marks[i] = (unsigned char)current;
+		student->marks[i] = current;
 		
 	}
 	
-	printf("CUROSSTR: %d\n", ftell(file));
+	/*printf("CUROSSTR: %d\n", ftell(file));*/
 	
 	/*printf("Mark: %d\n", student->marks[0]);
 	printf("Mark 2 : %d\n", student->marks[1]);
