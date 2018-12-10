@@ -30,7 +30,7 @@ int main() {
 	
 	FILE *outputFile;
 	
-	if ((outputFile = fopen(outputFileName, "w")) == NULL) {
+	if ((outputFile = fopen(outputFileName, "wb")) == NULL) {
 		
 		perror("An error occurred while trying to open the output file for writing");
 		

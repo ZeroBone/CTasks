@@ -18,7 +18,7 @@ int main() {
 	
 	FILE *inputFile;
 	
-	if ((inputFile = fopen(inputFileName, "r+")) == NULL) {
+	if ((inputFile = fopen(inputFileName, "r+b")) == NULL) {
 		
 		perror("An error occurred while trying to open the output file for writing");
 		
