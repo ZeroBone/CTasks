@@ -12,7 +12,7 @@
 #define MARK_TWO 2
 
 struct Student {
-	char* name;
+	char name[MAX_STUDENT_LAST_NAME_LENGTH];
 	unsigned char marks[3];
 };
 
@@ -21,9 +21,9 @@ unsigned char readMark();
 char markValid(unsigned char mark);
 int fileViewMenu(char *fileName);
 void writeStudent(FILE *file, struct Student *student);
+void readStudent(FILE *file, struct Student *student);
 void fwriteString(FILE *file, char *string);
-char* freadString(FILE *file, unsigned int maxLength);
-struct Student readStudent(FILE *file);
+void freadString(FILE *file, char *str, unsigned int maxLength);
 void writeInt(FILE *file, long int value);
 
 int main(int argc, char *argv[]) {
@@ -127,6 +127,18 @@ int fileViewMenu(char *fileName) {
 	
 	FILE *file;
 	
+	if ((file = fopen(fileName, "rb")) == NULL) {
+				
+		system("CLS");
+
+		perror("FS error");
+		
+		return 0;
+		
+	}
+	
+	fclose(file);
+	
 	puts("Please enter a number below to select what you want to do:");
 	puts("1 - view file.");
 	puts("2 - add exam result.");
@@ -148,6 +160,8 @@ int fileViewMenu(char *fileName) {
 			/* view file */
 			
 			if ((file = fopen(fileName, "rb")) == NULL) {
+				
+				system("CLS");
 		
 				perror("An error occurred while trying to open the file for reading");
 				
@@ -174,7 +188,7 @@ int fileViewMenu(char *fileName) {
 			long int offset = 0, i;
 			long int studentsPerPage = STUDENTS_PER_PAGE > totalCount ? totalCount : STUDENTS_PER_PAGE;
 			int choise;
-			struct Student stud;
+			struct Student *stud;
 			
 			printf("Student per page: %d\n", studentsPerPage);
 			
@@ -186,17 +200,13 @@ int fileViewMenu(char *fileName) {
 					
 					fseek(file, sizeof(long int) + ((offset + i) * STUDENT_COMPONENT_LENGTH), SEEK_SET);
 					
-					/*printf("Physics mark: %d\n", fgetc(file));
-					printf("Math mark: %d\n", fgetc(file));
-					printf("inf mark: %d\n", fgetc(file));*/
-					
-					stud = readStudent(file);
+					readStudent(file, stud);
 					
 					printf("Student last name: ");
-					puts(stud.name);
-					printf("Physics mark: %d\n", stud.marks[0]);
-					printf("Math mark: %d\n", stud.marks[1]);
-					printf("Informatics mark: %d\n", stud.marks[2]);
+					puts(stud->name);
+					printf("Physics mark: %d\n", stud->marks[0]);
+					printf("Math mark: %d\n", stud->marks[1]);
+					printf("Informatics mark: %d\n", stud->marks[2]);
 					
 				}
 				
@@ -231,6 +241,8 @@ int fileViewMenu(char *fileName) {
 				
 			}
 			exitMark:
+				
+			fclose(file);
 			
 			system("CLS");
 			
@@ -252,11 +264,10 @@ int fileViewMenu(char *fileName) {
 			
 			puts("Enter student last name:");
 			
-			char studentLastName[MAX_STUDENT_LAST_NAME_LENGTH];
-			fgets(studentLastName, MAX_STUDENT_LAST_NAME_LENGTH, stdin);
-			studentLastName[strlen(studentLastName) - 1] = '\0';
-			
 			struct Student student;
+			
+			fgets(student.name, MAX_STUDENT_LAST_NAME_LENGTH, stdin);
+			student.name[strlen(student.name) - 1] = '\0';
 			
 			puts("Enter the mark for physics:");
 			while (!markValid(student.marks[0] = readMark())) puts("Invalid mark entered, try again:");
@@ -266,8 +277,6 @@ int fileViewMenu(char *fileName) {
 			
 			puts("Enter the mark for informatics:");
 			while (!markValid(student.marks[2] = readMark())) puts("Invalid mark entered, try again:");
-			
-			student.name = studentLastName;
 			
 			long int studentCount = 0;
 			fread(&studentCount, sizeof(long int), 1, file);
@@ -349,6 +358,16 @@ void writeStudent(FILE *file, struct Student *student) {
 	
 }
 
+void readStudent(FILE *file, struct Student *student) {
+	
+	student->marks[0] = (unsigned char)fgetc(file);
+	student->marks[1] = (unsigned char)fgetc(file);
+	student->marks[2] = (unsigned char)fgetc(file);
+	
+	freadString(file, student->name, MAX_STUDENT_LAST_NAME_LENGTH);
+	
+}
+
 void fwriteString(FILE *file, char *string) {
 	
 	while (*string != '\0') {
@@ -363,9 +382,8 @@ void fwriteString(FILE *file, char *string) {
 	
 }
 
-char* freadString(FILE *file, unsigned int maxLength) {
+void freadString(FILE *file, char *str, unsigned int maxLength) {
 	
-	char str[maxLength];
 	unsigned int i;
 	int current;
 	
@@ -384,22 +402,6 @@ char* freadString(FILE *file, unsigned int maxLength) {
 		str[i] = current;
 		
 	}
-	
-	return str;
-	
-}
-
-struct Student readStudent(FILE *file) {
-	
-	struct Student student;
-	
-	student.marks[0] = (unsigned char)fgetc(file);
-	student.marks[1] = (unsigned char)fgetc(file);
-	student.marks[2] = (unsigned char)fgetc(file);
-	
-	student.name = freadString(file, MAX_STUDENT_LAST_NAME_LENGTH);
-	
-	return student;
 	
 }
 
