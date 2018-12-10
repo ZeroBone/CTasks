@@ -5,15 +5,14 @@
 #include <string.h>
 #define MAX_FNAME_LENGTH 50
 #define MAX_STUDENT_LAST_NAME_LENGTH 20
-#define STUDENT_COMPONENT_LENGTH 27
-#define STUDENTS_PER_PAGE 5
+#define STUDENT_COMPONENT_LENGTH 23
 #define MARK_MIN 2
 #define MARK_MAX 5
 #define MARK_TWO 2
 
 struct Student {
-	char name[MAX_STUDENT_LAST_NAME_LENGTH];
 	unsigned char marks[3];
+	char name[MAX_STUDENT_LAST_NAME_LENGTH];
 };
 
 int mainMenu();
@@ -21,7 +20,7 @@ unsigned char readMark();
 char markValid(unsigned char mark);
 int fileViewMenu(char *fileName);
 void writeStudent(FILE *file, struct Student *student);
-void readStudent(FILE *file, struct Student *student);
+char readStudent(FILE *file, struct Student *student);
 void fwriteString(FILE *file, char *string);
 void freadString(FILE *file, char *str, unsigned int maxLength);
 void writeInt(FILE *file, long int value);
@@ -79,7 +78,7 @@ int mainMenu() {
 				
 			}
 			
-			writeInt(outputFile, 0); /* student count */
+			/* writeInt(outputFile, 0); */ /* student count */
 			
 			fclose(outputFile);
 			
@@ -159,7 +158,7 @@ int fileViewMenu(char *fileName) {
 			
 			/* view file */
 			
-			if ((file = fopen(fileName, "rb")) == NULL) {
+			if ((file = fopen(fileName, "r+b")) == NULL) {
 				
 				system("CLS");
 		
@@ -169,44 +168,54 @@ int fileViewMenu(char *fileName) {
 				
 			}
 			
-			long int totalCount;
-			
 			fseek(file, 0, SEEK_SET);
 			
-			fread(&totalCount, sizeof(long int), 1, file);
-			
-			if (!totalCount) {
-				
-				system("CLS");
-				
-				puts("File empty, nothing to view.");
-				
-				break;
-				
-			}
-			
-			long int offset = 0, i;
-			long int studentsPerPage = STUDENTS_PER_PAGE > totalCount ? totalCount : STUDENTS_PER_PAGE;
+			long int offset = 0, i, studentsPerPage = 5;
 			int choise;
 			struct Student *stud;
-			
-			printf("Student per page: %d\n", studentsPerPage);
 			
 			while (1) {
 				
 				system("CLS");
 				
+				fseek(file, (offset) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+				
+				if (!readStudent(file, stud)) {
+					
+					printf("CurPos: %d\n", ftell(file));
+					
+					puts("File empty, nothing to view.");
+					
+					goto exitMark;
+					
+				}
+				
+				puts("|  N|        Name        | P | M | I |");
+				puts("--------------------------------------");
+				
 				for (i = 0; i < studentsPerPage; i++) {
 					
-					fseek(file, sizeof(long int) + ((offset + i) * STUDENT_COMPONENT_LENGTH), SEEK_SET);
+					fseek(file, (offset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 					
-					readStudent(file, stud);
+					if (!readStudent(file, stud)) {
 					
-					printf("Student last name: ");
+						break;
+						
+					}
+					
+					/*printf("Student last name: ");
 					puts(stud->name);
 					printf("Physics mark: %d\n", stud->marks[0]);
 					printf("Math mark: %d\n", stud->marks[1]);
-					printf("Informatics mark: %d\n", stud->marks[2]);
+					printf("Informatics mark: %d\n", stud->marks[2]);*/
+					
+					printf("|%3d|%-20s| %1d | %1d | %1d |\n",
+						i + offset + 1,
+						stud->name,
+						stud->marks[0],
+						stud->marks[1],
+						stud->marks[2]
+					);
 					
 				}
 				
@@ -225,16 +234,22 @@ int fileViewMenu(char *fileName) {
 						offset -= studentsPerPage;
 						if (offset < 0) offset = 0;
 						
+						system("CLS");
+						
 						break;
 						
 					case 2:
 						/* scroll down */
 						offset += studentsPerPage;
-						if (offset > totalCount - studentsPerPage) offset = totalCount - studentsPerPage;
+						
+						system("CLS");
 						
 						break;
 					
 					default:
+						
+						system("CLS");
+						
 						goto exitMark;
 					
 				}
@@ -243,8 +258,6 @@ int fileViewMenu(char *fileName) {
 			exitMark:
 				
 			fclose(file);
-			
-			system("CLS");
 			
 			break;
 		
@@ -278,14 +291,12 @@ int fileViewMenu(char *fileName) {
 			puts("Enter the mark for informatics:");
 			while (!markValid(student.marks[2] = readMark())) puts("Invalid mark entered, try again:");
 			
-			long int studentCount = 0;
-			fread(&studentCount, sizeof(long int), 1, file);
+			/*fseek(file, 0, SEEK_SET);*/
 			
-			fseek(file, 0, SEEK_SET);
+			fseek(file, 0, SEEK_END);
+			long int fileLength = ftell(file);
 			
-			writeInt(file, studentCount + 1);
-			
-			fseek(file, sizeof(long int) + (studentCount * STUDENT_COMPONENT_LENGTH), SEEK_SET);
+			fseek(file, fileLength, SEEK_SET);
 			
 			writeStudent(file, &student);
 			
@@ -350,21 +361,53 @@ unsigned char readMark() {
 
 void writeStudent(FILE *file, struct Student *student) {
 	
+	int before = ftell(file);
+	
 	fputc(student->marks[0], file);
 	fputc(student->marks[1], file);
 	fputc(student->marks[2], file);
 	
 	fwriteString(file, student->name);
 	
+	int written = ftell(file) - before;
+	
+	for (;written < STUDENT_COMPONENT_LENGTH; written++) {
+		
+		fputc(0, file);
+		
+	}
+	
 }
 
-void readStudent(FILE *file, struct Student *student) {
+char readStudent(FILE *file, struct Student *student) {
 	
-	student->marks[0] = (unsigned char)fgetc(file);
-	student->marks[1] = (unsigned char)fgetc(file);
-	student->marks[2] = (unsigned char)fgetc(file);
+	int current, i;
+	
+	printf("CUROS: %d\n", ftell(file));
+	
+	for (i = 0; i < 3; i++) {
+		
+		current = fgetc(file);
+	
+		if (current == EOF) {
+			
+			return 0;
+			
+		}
+		
+		student->marks[i] = (unsigned char)current;
+		
+	}
+	
+	printf("CUROSSTR: %d\n", ftell(file));
+	
+	/*printf("Mark: %d\n", student->marks[0]);
+	printf("Mark 2 : %d\n", student->marks[1]);
+	printf("Mark 3: %d\n", student->marks[2]);*/
 	
 	freadString(file, student->name, MAX_STUDENT_LAST_NAME_LENGTH);
+	
+	return 1;
 	
 }
 
@@ -391,7 +434,7 @@ void freadString(FILE *file, char *str, unsigned int maxLength) {
 		
 		current = fgetc(file);
 		
-		if (current == 0 || current == EOF) {
+		if (current == '\0' || current == EOF) {
 			
 			str[i] = '\0';
 			
