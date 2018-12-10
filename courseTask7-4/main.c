@@ -7,14 +7,12 @@
 #define MAX_STUDENT_LAST_NAME_LENGTH 20
 #define STUDENT_COMPONENT_LENGTH 27
 #define STUDENTS_PER_PAGE 5
-
-struct ZString {
-	unsigned long int length;
-	char* str;
-};
+#define MARK_MIN 2
+#define MARK_MAX 5
+#define MARK_TWO 2
 
 struct Student {
-	struct ZString name;
+	char* name;
 	unsigned char marks[3];
 };
 
@@ -23,11 +21,10 @@ unsigned char readMark();
 char markValid(unsigned char mark);
 int fileViewMenu(char *fileName);
 void writeStudent(FILE *file, struct Student *student);
-struct Student *readStudent(FILE *file);
-void writeZString(FILE *file, struct ZString *str);
-void toZString(char* str, struct ZString *zString);
+void fwriteString(FILE *file, char *string);
+char* freadString(FILE *file, unsigned int maxLength);
+struct Student readStudent(FILE *file);
 void writeInt(FILE *file, long int value);
-struct ZString *readZString(FILE *file, unsigned long int maxLength);
 
 int main(int argc, char *argv[]) {
 	
@@ -86,9 +83,11 @@ int mainMenu() {
 			
 			fclose(outputFile);
 			
+			system("CLS");
+			
 			puts("File successfully created.");
 			
-			return 1;
+			break;
 			
 		case 2:
 			
@@ -101,14 +100,18 @@ int mainMenu() {
 			fgets(fileName, MAX_FNAME_LENGTH, stdin);
 			fileName[strlen(fileName) - 1] = '\0';
 			
+			system("CLS");
+			
 			while (fileViewMenu(fileName) == 1);
 			
-			return 1;
+			break;
 			
 		case 3:
 			return 0;
 			
 		default:
+			
+			system("CLS");
 			
 			puts("The number you entered doesn't correspond to any of the menu items. Please try again.");
 			
@@ -116,7 +119,7 @@ int mainMenu() {
 		
 	}
 	
-	return 0;
+	return 1;
 	
 }
 
@@ -160,6 +163,8 @@ int fileViewMenu(char *fileName) {
 			
 			if (!totalCount) {
 				
+				system("CLS");
+				
 				puts("File empty, nothing to view.");
 				
 				break;
@@ -169,26 +174,29 @@ int fileViewMenu(char *fileName) {
 			long int offset = 0, i;
 			long int studentsPerPage = STUDENTS_PER_PAGE > totalCount ? totalCount : STUDENTS_PER_PAGE;
 			int choise;
-			struct Student *stud;
+			struct Student stud;
 			
 			printf("Student per page: %d\n", studentsPerPage);
 			
 			while (1) {
 				
+				system("CLS");
+				
 				for (i = 0; i < studentsPerPage; i++) {
 					
 					fseek(file, sizeof(long int) + ((offset + i) * STUDENT_COMPONENT_LENGTH), SEEK_SET);
 					
+					/*printf("Physics mark: %d\n", fgetc(file));
+					printf("Math mark: %d\n", fgetc(file));
+					printf("inf mark: %d\n", fgetc(file));*/
+					
 					stud = readStudent(file);
 					
-					/*printf("Student last name: ");
-					puts(stud->name.str);*/
-					printf("Physics mark: %d\n", stud->marks[0]);
-					printf("Math mark: %d\n", stud->marks[1]);
-					printf("Informatics mark: %d\n", stud->marks[2]);
-					printf("Physics mark: %u\n", stud->marks[0]);
-					printf("Math mark: %u\n", stud->marks[1]);
-					printf("Informatics mark: %u\n", stud->marks[2]);
+					printf("Student last name: ");
+					puts(stud.name);
+					printf("Physics mark: %d\n", stud.marks[0]);
+					printf("Math mark: %d\n", stud.marks[1]);
+					printf("Informatics mark: %d\n", stud.marks[2]);
 					
 				}
 				
@@ -224,11 +232,13 @@ int fileViewMenu(char *fileName) {
 			}
 			exitMark:
 			
-			/* TODO: call viewFileMenu(fileName) */
+			system("CLS");
 			
 			break;
 		
 		case 2:
+			
+			system("CLS");
 			
 			if ((file = fopen(fileName, "wb")) == NULL) {
 		
@@ -257,7 +267,7 @@ int fileViewMenu(char *fileName) {
 			puts("Enter the mark for informatics:");
 			while (!markValid(student.marks[2] = readMark())) puts("Invalid mark entered, try again:");
 			
-			toZString(studentLastName, &student.name);
+			student.name = studentLastName;
 			
 			long int studentCount = 0;
 			fread(&studentCount, sizeof(long int), 1, file);
@@ -279,6 +289,8 @@ int fileViewMenu(char *fileName) {
 		case 3:
 			/* delete an exam result */
 			
+			system("CLS");
+			
 			if ((file = fopen(fileName, "wb")) == NULL) {
 		
 				perror("An error occurred while trying to open the file for writing");
@@ -291,9 +303,15 @@ int fileViewMenu(char *fileName) {
 			
 			break;
 			
-		case 7: return 0;
+		case 7:
+			
+			system("CLS");
+			
+			return 0;
 		
 		default:
+			
+			system("CLS");
 			
 			puts("Invalid menu item selected, try again.");
 			
@@ -307,7 +325,7 @@ int fileViewMenu(char *fileName) {
 
 char markValid(unsigned char mark) {
 	
-	return mark >= 2 && mark <= 5;
+	return mark >= MARK_MIN && mark <= MARK_MAX;
 	
 }
 
@@ -327,11 +345,51 @@ void writeStudent(FILE *file, struct Student *student) {
 	fputc(student->marks[1], file);
 	fputc(student->marks[2], file);
 	
-	writeZString(file, &student->name);
+	fwriteString(file, student->name);
 	
 }
 
-struct Student *readStudent(FILE *file) {
+void fwriteString(FILE *file, char *string) {
+	
+	while (*string != '\0') {
+		
+		fputc(*string, file);
+		
+		string++;
+		
+	}
+	
+	fputc(0, file);
+	
+}
+
+char* freadString(FILE *file, unsigned int maxLength) {
+	
+	char str[maxLength];
+	unsigned int i;
+	int current;
+	
+	for (i = 0; i < maxLength; i++) {
+		
+		current = fgetc(file);
+		
+		if (current == 0 || current == EOF) {
+			
+			str[i] = '\0';
+			
+			break;
+			
+		}
+		
+		str[i] = current;
+		
+	}
+	
+	return str;
+	
+}
+
+struct Student readStudent(FILE *file) {
 	
 	struct Student student;
 	
@@ -339,61 +397,9 @@ struct Student *readStudent(FILE *file) {
 	student.marks[1] = (unsigned char)fgetc(file);
 	student.marks[2] = (unsigned char)fgetc(file);
 	
-	printf("STUD MRKS: %d %d %d\n", student.marks[0], student.marks[1], student.marks[2]);
-	printf("(2) STUD MRKS: %u %u %u\n", student.marks[0], student.marks[1], student.marks[2]);
+	student.name = freadString(file, MAX_STUDENT_LAST_NAME_LENGTH);
 	
-	student.name = *readZString(file, 20);
-	
-	return &student;
-	
-}
-
-struct ZString *readZString(FILE *file, unsigned long int maxLength) {
-	
-	struct ZString zString;
-	
-	fread(&zString.length, sizeof(long int), 1, file);
-	
-	unsigned long int i, len = zString.length > maxLength ? maxLength : zString.length;
-	char str[len + 1];
-	int temp;
-	
-	for (i = 0; i < len; i++) {
-		
-		temp = fgetc(file);
-		
-		if (temp == EOF) {
-			
-			str[i] = '\0';
-			break;
-			
-		}
-		
-		str[i] = temp;
-		
-	}
-	
-	str[len] = '\0';
-	
-	zString.str = str;
-	
-	return &zString;
-	
-}
-
-void writeZString(FILE *file, struct ZString *str) {
-	
-	fwrite(&str->length, sizeof(long int), 1, file);
-	
-	fwrite(str->str, sizeof(char), str->length, file);
-	
-}
-
-void toZString(char* str, struct ZString *zString) {
-	
-	zString->length = (unsigned long int)strlen(str);
-	
-	zString->str = str;
+	return student;
 	
 }
 
