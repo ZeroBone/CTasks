@@ -171,13 +171,24 @@ int fileViewMenu(char *fileName) {
 			int choise;
 			struct Student *stud;
 			
+			printf("Student per page: %d\n", studentsPerPage);
+			
 			while (1) {
 				
-				for (i = 0; i < 5; i++) {
+				for (i = 0; i < studentsPerPage; i++) {
 					
-					fseek(file, sizeof(long int) + (offset * STUDENT_COMPONENT_LENGTH), SEEK_SET);
+					fseek(file, sizeof(long int) + ((offset + i) * STUDENT_COMPONENT_LENGTH), SEEK_SET);
 					
 					stud = readStudent(file);
+					
+					/*printf("Student last name: ");
+					puts(stud->name.str);*/
+					printf("Physics mark: %d\n", stud->marks[0]);
+					printf("Math mark: %d\n", stud->marks[1]);
+					printf("Informatics mark: %d\n", stud->marks[2]);
+					printf("Physics mark: %u\n", stud->marks[0]);
+					printf("Math mark: %u\n", stud->marks[1]);
+					printf("Informatics mark: %u\n", stud->marks[2]);
 					
 				}
 				
@@ -193,15 +204,15 @@ int fileViewMenu(char *fileName) {
 					case 1:
 						/* scroll up */
 						
-						offset -= 5;
+						offset -= studentsPerPage;
 						if (offset < 0) offset = 0;
 						
 						break;
 						
 					case 2:
 						/* scroll down */
-						offset += 5;
-						if (offset > totalCount - 5) offset = totalCount - 5;
+						offset += studentsPerPage;
+						if (offset > totalCount - studentsPerPage) offset = totalCount - studentsPerPage;
 						
 						break;
 					
@@ -324,11 +335,14 @@ struct Student *readStudent(FILE *file) {
 	
 	struct Student student;
 	
-	student.marks[0] = fgetc(file);
-	student.marks[1] = fgetc(file);
-	student.marks[2] = fgetc(file);
+	student.marks[0] = (unsigned char)fgetc(file);
+	student.marks[1] = (unsigned char)fgetc(file);
+	student.marks[2] = (unsigned char)fgetc(file);
 	
-	readZString(file, 20);
+	printf("STUD MRKS: %d %d %d\n", student.marks[0], student.marks[1], student.marks[2]);
+	printf("(2) STUD MRKS: %u %u %u\n", student.marks[0], student.marks[1], student.marks[2]);
+	
+	student.name = *readZString(file, 20);
 	
 	return &student;
 	
