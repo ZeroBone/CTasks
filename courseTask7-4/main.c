@@ -867,6 +867,9 @@ int deleteExamResult(char *fileName) {
 	fclose(file);
 	fclose(tempFile);
 	
+	unlink(fileName);
+	rename("temp.bin", fileName);
+	
 	return 0;
 	
 }
