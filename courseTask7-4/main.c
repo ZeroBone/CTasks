@@ -17,11 +17,14 @@ struct Student {
 
 int mainMenu();
 char readMark();
+void tableTop();
+void tableStudent(long number, struct Student *stud);
+void tableBottom();
 char markValid(char mark);
 int fileViewMenu(char *fileName);
 void writeStudent(FILE *file, struct Student *student);
 char readStudent(FILE *file, struct Student *student);
-void fwriteString(FILE *file, char *string);
+unsigned long fwriteString(FILE *file, char *string);
 void freadString(FILE *file, char *str, unsigned int maxLength);
 void writeInt(FILE *file, long int value);
 
@@ -183,17 +186,22 @@ int fileViewMenu(char *fileName) {
 				
 				if (!readStudent(file, stud)) {
 					
-					printf("CurPos: %d\n", ftell(file));
-					
-					puts("File empty, nothing to view.");
+					if (!offset) {
+						
+						puts("File empty, nothing to view.");
+						
+					}
+					else {
+						
+						puts("Nothing to view.");
+						
+					}
 					
 					goto exitMark;
 					
 				}
 				
-				puts("--------------------------------------");
-				puts("|  N|        Name        | P | M | I |");
-				puts("--------------------------------------");
+				tableTop();
 				
 				for (i = 0; i < studentsPerPage; i++) {
 					
@@ -213,17 +221,11 @@ int fileViewMenu(char *fileName) {
 					printf("Math mark: %d\n", stud->marks[1]);
 					printf("Informatics mark: %d\n", stud->marks[2]);*/
 					
-					printf("|%3d|%-20s| %1d | %1d | %1d |\n",
-						i + offset + 1,
-						stud->name,
-						stud->marks[0],
-						stud->marks[1],
-						stud->marks[2]
-					);
+					tableStudent(i + offset + 1, stud);
 					
 				}
 				
-				puts("--------------------------------------");
+				tableBottom();
 				
 				puts("Which direction do you want to scroll to?");
 				puts("1 - scroll up.");
@@ -273,7 +275,7 @@ int fileViewMenu(char *fileName) {
 			
 			system("CLS");
 			
-			if ((file = fopen(fileName, "wb")) == NULL) {
+			if ((file = fopen(fileName, "ab")) == NULL) {
 		
 				perror("An error occurred while trying to open the file for writing");
 				
@@ -301,9 +303,9 @@ int fileViewMenu(char *fileName) {
 			
 			/*fseek(file, 0, SEEK_SET);*/
 			
-			fseek(file, -1, SEEK_END);
+			/*fseek(file, -1, SEEK_END);*/
 			
-			printf("Writing to %d\n", ftell(file));
+			/*printf("Writing to %d\n", ftell(file));*/
 			
 			writeStudent(file, &student);
 			
@@ -352,6 +354,32 @@ int fileViewMenu(char *fileName) {
 	
 }
 
+void tableTop() {
+	
+	puts("--------------------------------------");
+	puts("|  N|        Name        | P | M | I |");
+	puts("--------------------------------------");
+	
+}
+
+void tableStudent(long number, struct Student *stud) {
+	
+	printf("|%3d|%-20s| %1d | %1d | %1d |\n",
+		number + 1,
+		stud->name,
+		stud->marks[0],
+		stud->marks[1],
+		stud->marks[2]
+	);
+	
+}
+
+void tableBottom() {
+	
+	puts("--------------------------------------");
+	
+}
+
 char markValid(char mark) {
 	
 	return mark >= MARK_MIN && mark <= MARK_MAX;
@@ -370,15 +398,13 @@ char readMark() {
 
 void writeStudent(FILE *file, struct Student *student) {
 	
-	int before = ftell(file);
-	
 	fputc(student->marks[0], file);
 	fputc(student->marks[1], file);
 	fputc(student->marks[2], file);
 	
-	fwriteString(file, student->name);
+	int written = 3 + fwriteString(file, student->name);
 	
-	int written = ftell(file) - before;
+	printf("Written: %d\n", written);
 	
 	for (;written < STUDENT_COMPONENT_LENGTH; written++) {
 		
@@ -420,7 +446,9 @@ char readStudent(FILE *file, struct Student *student) {
 	
 }
 
-void fwriteString(FILE *file, char *string) {
+unsigned long fwriteString(FILE *file, char *string) {
+	
+	unsigned long len = 1;
 	
 	while (*string != '\0') {
 		
@@ -428,9 +456,13 @@ void fwriteString(FILE *file, char *string) {
 		
 		string++;
 		
+		len++;
+		
 	}
 	
 	fputc(0, file);
+	
+	return len;
 	
 }
 
