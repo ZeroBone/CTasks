@@ -17,6 +17,7 @@ struct Student {
 
 int mainMenu();
 char readMark();
+void inputStudent(struct Student *student);
 void tableTop();
 void tableStudent(long number, struct Student *stud);
 void tableBottom();
@@ -27,6 +28,8 @@ char readStudent(FILE *file, struct Student *student);
 unsigned long fwriteString(FILE *file, char *string);
 void freadString(FILE *file, char *str, unsigned int maxLength);
 void writeInt(FILE *file, long int value);
+int twosForAtLeast1Exam(char *fileName);
+int deleteExamResult(char *fileName);
 
 int main(int argc, char *argv[]) {
 	
@@ -176,7 +179,7 @@ int fileViewMenu(char *fileName) {
 			
 			long int offset = 0, i, studentsPerPage = 5;
 			int choise;
-			struct Student *stud;
+			struct Student stud;
 			
 			while (1) {
 				
@@ -184,7 +187,7 @@ int fileViewMenu(char *fileName) {
 				
 				fseek(file, offset * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 				
-				if (!readStudent(file, stud)) {
+				if (!readStudent(file, &stud)) {
 					
 					if (!offset) {
 						
@@ -207,7 +210,7 @@ int fileViewMenu(char *fileName) {
 					
 					fseek(file, (offset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 					
-					if (!readStudent(file, stud)) {
+					if (!readStudent(file, &stud)) {
 						
 						fseek(file, 0, SEEK_SET);
 					
@@ -221,7 +224,7 @@ int fileViewMenu(char *fileName) {
 					printf("Math mark: %d\n", stud->marks[1]);
 					printf("Informatics mark: %d\n", stud->marks[2]);*/
 					
-					tableStudent(i + offset + 1, stud);
+					tableStudent(i + offset, &stud);
 					
 				}
 				
@@ -285,21 +288,9 @@ int fileViewMenu(char *fileName) {
 			
 			/* add exam result */
 			
-			puts("Enter student last name:");
-			
 			struct Student student;
 			
-			fgets(student.name, MAX_STUDENT_LAST_NAME_LENGTH, stdin);
-			student.name[strlen(student.name) - 1] = '\0';
-			
-			puts("Enter the mark for physics:");
-			while (!markValid(student.marks[0] = readMark())) puts("Invalid mark entered, try again:");
-			
-			puts("Enter the mark for math:");
-			while (!markValid(student.marks[1] = readMark())) puts("Invalid mark entered, try again:");
-			
-			puts("Enter the mark for informatics:");
-			while (!markValid(student.marks[2] = readMark())) puts("Invalid mark entered, try again:");
+			inputStudent(&student);
 			
 			/*fseek(file, 0, SEEK_SET);*/
 			
@@ -318,22 +309,164 @@ int fileViewMenu(char *fileName) {
 		case 3:
 			/* delete an exam result */
 			
-			system("CLS");
+			return deleteExamResult(fileName);
 			
-			if ((file = fopen(fileName, "wb")) == NULL) {
+		case 4:
+			
+			/* edit an exam result */
+			
+			if ((file = fopen(fileName, "r+b")) == NULL) {
 		
-				perror("An error occurred while trying to open the file for writing");
+				perror("An error occurred while trying to open the file for editing");
 				
 				return 1;
 				
 			}
 			
-			/* TODO */
+			/* fseek(file, 0, SEEK_CUR); */
+			
+			puts("Enter student last name:");
+			
+			char studentName[MAX_STUDENT_LAST_NAME_LENGTH];
+			fgets(studentName, MAX_STUDENT_LAST_NAME_LENGTH, stdin);
+			studentName[strlen(studentName) - 1] = '\0';
+			
+			system("CLS");
+			
+			struct Student st;
+			long int n = 0, found = 0;
+			char yes;
+			
+			while (1) {
+				
+				fseek(file, n * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+				
+				if (!readStudent(file, &st)) {
+					
+					break;
+					
+				}
+				
+				printf("Comp: Read: %s Searching: %s\n", st.name, studentName);
+				
+				if (!strcmp(st.name, studentName)) {
+					
+					found++;
+					
+					system("CLS");
+					
+					tableTop();
+					
+					tableStudent(n, &st);
+					
+					puts("Edit? (y/n)");
+					
+					do {
+						
+						yes = getchar();
+						
+					} while (yes != 'y' && yes != 'Y' && yes != 'n' && yes != 'N');
+					
+					getchar();
+					
+					if (yes == 'y' || yes == 'Y') {
+						
+						inputStudent(&st);
+						
+						fseek(file, n * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+						
+						writeStudent(file, &st);
+						
+						fseek(file, 0, SEEK_CUR); /* to write mode */
+						
+					}
+					
+				}
+				
+				n++;
+				
+			}
+			
+			if (n == 0) {
+				
+				puts("File empty.");
+				
+			}
+			else if (found == 0) {
+				
+				puts("No matching students found.");
+				
+			}
 			
 			fclose(file);
 			
 			break;
 			
+		case 5:
+			
+			/* get the amount of 2-s for every discipline */
+			
+			if ((file = fopen(fileName, "rb")) == NULL) {
+				
+				system("CLS");
+		
+				perror("(2) An error occurred while trying to open the file for reading");
+				
+				return 1;
+				
+			}
+			
+			fseek(file, 0, SEEK_SET);
+			
+			long int twos[] = {0, 0, 0};
+			long int off = 0;
+			int k;
+			struct Student stu;
+			
+			while (1) {
+				
+				fseek(file, off * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+				
+				if (!readStudent(file, &stu)) {
+					
+					if (!off) {
+						
+						puts("File empty, nothing to view.");
+						
+					}
+					
+					break;
+					
+				}
+				
+				for (k = 0; k < 3; k++) {
+					
+					if (stu.marks[k] == MARK_TWO) {
+						
+						twos[k]++;
+						
+					}
+					
+				}
+				
+				off++;
+				
+			}
+			
+			printf("Two's for physics: %d\n", twos[0]);
+			printf("Two's for math: %d\n", twos[1]);
+			printf("Two's for informatics: %d\n", twos[2]);
+			
+			fclose(file);
+			
+			break;
+			
+		case 6:
+			
+			/* get students, that have 2-s for at least 1 exam */
+			
+			return twosForAtLeast1Exam(fileName);
+		
 		case 7:
 			
 			system("CLS");
@@ -351,6 +484,24 @@ int fileViewMenu(char *fileName) {
 	}
 	
 	return 1;
+	
+}
+
+void inputStudent(struct Student *student) {
+	
+	puts("Enter student last name:");
+	
+	fgets(student->name, MAX_STUDENT_LAST_NAME_LENGTH, stdin);
+	student->name[strlen(student->name) - 1] = '\0';
+	
+	puts("Enter the mark for physics:");
+	while (!markValid(student->marks[0] = readMark())) puts("Invalid mark entered, try again:");
+	
+	puts("Enter the mark for math:");
+	while (!markValid(student->marks[1] = readMark())) puts("Invalid mark entered, try again:");
+	
+	puts("Enter the mark for informatics:");
+	while (!markValid(student->marks[2] = readMark())) puts("Invalid mark entered, try again:");
 	
 }
 
@@ -417,8 +568,6 @@ void writeStudent(FILE *file, struct Student *student) {
 char readStudent(FILE *file, struct Student *student) {
 	
 	int current, i;
-	
-	/*printf("CUROS: %d\n", ftell(file));*/
 	
 	for (i = 0; i < 3; i++) {
 		
@@ -498,5 +647,226 @@ void writeInt(FILE *file, long int value) {
 	fputc((uvalue >> 16) & 0xff, file);
 	fputc((uvalue >> 8) & 0xff, file);
 	fputc(uvalue & 0xff, file);*/
+	
+}
+
+int twosForAtLeast1Exam(char *fileName) {
+	
+	FILE *file;
+	
+	if ((file = fopen(fileName, "rb")) == NULL) {
+				
+		system("CLS");
+
+		perror("An error occurred while trying to open the file for reading");
+		
+		return 1;
+		
+	}
+	
+	fseek(file, 0, SEEK_SET);
+	
+	long int soffset = 0, j, stPerPage = 5;
+	int scroll;
+	struct Student stu_;
+	
+	while (1) {
+		
+		system("CLS");
+		
+		fseek(file, soffset * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+		
+		if (!readStudent(file, &stu_)) {
+			
+			if (!soffset) {
+				
+				puts("File empty, nothing to view.");
+				
+			}
+			
+			goto exitM;
+			
+		}
+		
+		tableTop();
+		
+		j = 0;
+		
+		while (j < stPerPage) {
+			
+			fseek(file, (soffset + j) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+			
+			if (!readStudent(file, &stu_)) {
+				
+				fseek(file, 0, SEEK_SET);
+			
+				break;
+				
+			}
+			
+			if (stu_.marks[0] == MARK_TWO || stu_.marks[1] == MARK_TWO || stu_.marks[2] == MARK_TWO) {
+				
+				tableStudent(j + soffset, &stu_);
+				
+			}
+			
+			j++;
+			
+		}
+		
+		tableBottom();
+		
+		puts("Which direction do you want to scroll to?");
+		puts("1 - scroll up.");
+		puts("2 - scroll down.");
+		puts("3 - exit.");
+		
+		scanf("%d", &scroll);
+		
+		getchar();
+		
+		switch (scroll) {
+			
+			case 1:
+				/* scroll up */
+				
+				soffset -= stPerPage;
+				if (soffset < 0) soffset = 0;
+				
+				system("CLS");
+				
+				break;
+				
+			case 2:
+				/* scroll down */
+				soffset += stPerPage;
+				
+				system("CLS");
+				
+				break;
+			
+			default:
+				
+				system("CLS");
+				
+				goto exitM;
+			
+		}
+		
+	}
+	exitM:
+		
+	fclose(file);
+	
+	return 0;
+	
+}
+
+int deleteExamResult(char *fileName) {
+	
+	FILE *file;
+	FILE *tempFile;
+	
+	if ((file = fopen(fileName, "r+b")) == NULL) {
+		
+		perror("An error occurred while trying to open the file for reading");
+		
+		return 1;
+		
+	}
+	
+	if ((tempFile = fopen("temp.bin", "wb")) == NULL) {
+		
+		perror("An error occurred while trying to open the file for reading");
+		
+		return 1;
+		
+	}
+	
+	/* fseek(file, 0, SEEK_CUR); */
+	
+	puts("Enter student last name:");
+	
+	char studentName[MAX_STUDENT_LAST_NAME_LENGTH];
+	fgets(studentName, MAX_STUDENT_LAST_NAME_LENGTH, stdin);
+	studentName[strlen(studentName) - 1] = '\0';
+	
+	system("CLS");
+	
+	struct Student st;
+	long int n = 0, found = 0;
+	int i;
+	char yes;
+	char keep = 1;
+	
+	while (1) {
+		
+		fseek(file, n * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+		
+		if (!readStudent(file, &st)) {
+			
+			break;
+			
+		}
+		
+		if (!strcmp(st.name, studentName)) {
+			
+			found++;
+			
+			system("CLS");
+			
+			tableTop();
+			
+			tableStudent(n, &st);
+			
+			puts("Delete? (y/n)");
+			
+			do {
+				
+				yes = getchar();
+				
+			} while (yes != 'y' && yes != 'Y' && yes != 'n' && yes != 'N');
+			
+			getchar();
+			
+			if (yes == 'y' || yes == 'Y') {
+				
+				fseek(file, n * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+				
+				keep = 0;
+				
+				fseek(file, 0, SEEK_CUR); /* to write mode */
+				
+			}
+			else keep = 1;
+			
+		}
+		else keep = 1;
+		
+		if (keep) {
+			
+			writeStudent(tempFile, &st);
+			
+		}
+		
+		n++;
+		
+	}
+	
+	if (n == 0) {
+		
+		puts("File empty.");
+		
+	}
+	else if (found == 0) {
+		
+		puts("No matching students found.");
+		
+	}
+	
+	fclose(file);
+	fclose(tempFile);
+	
+	return 0;
 	
 }

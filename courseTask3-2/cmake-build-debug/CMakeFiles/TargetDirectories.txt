@@ -1,3 +1,0 @@
-D:/voenmeh/zerobone/courseTasks/courseTask3-2/cmake-build-debug/CMakeFiles/courseTask3_2.dir
-D:/voenmeh/zerobone/courseTasks/courseTask3-2/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/voenmeh/zerobone/courseTasks/courseTask3-2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
