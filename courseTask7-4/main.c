@@ -10,7 +10,6 @@
 #define MARK_MAX 5
 #define MARK_TWO 2
 #define ROWS_PER_PAGE 5
-
 #define RU 1
 
 struct Student {

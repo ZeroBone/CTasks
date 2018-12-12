@@ -5,6 +5,54 @@
 #define MAX_FNAME_LENGTH 50
 #define EPSILON 1e-6
 
+/*
+Enter input file name:
+five.bin
+File contents:
+4.000000
+5.000000
+6.000000
+7.000000
+8.000000
+First: 4.000000 Last: 8.000000
+New file contents:
+8.000000
+9.000000
+10.000000
+11.000000
+12.000000
+==========================
+Enter input file name:
+three.bin
+File contents:
+2.000000
+3.000000
+367869.000000
+First: 2.000000 Last: 367869.000000
+New file contents:
+4.000000
+5.000000
+367871.000000
+==========================
+Enter input file name:
+n.bin
+File contents:
+-8.000000
+-3.000000
+222.000000
+-29.000000
+-40.000000
+0.000000
+First: -8.000000 Last: 0.000000
+New file contents:
+-8.000000
+-3.000000
+214.000000
+-29.000000
+-40.000000
+0.000000
+*/
+
 void printFile(FILE*);
 
 int main() {
