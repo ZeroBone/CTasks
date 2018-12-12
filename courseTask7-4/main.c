@@ -11,6 +11,8 @@
 #define MARK_TWO 2
 #define ROWS_PER_PAGE 5
 
+#define RU 1
+
 struct Student {
 	char marks[3];
 	char name[MAX_STUDENT_LAST_NAME_LENGTH];
@@ -42,7 +44,8 @@ int main(int argc, char *argv[]) {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 	
-	puts("Welcome!");
+	if (RU) puts("Добро пожаловать!");
+	else puts("Welcome!");
 	
 	while (mainMenu() == 1);
 	
@@ -54,10 +57,22 @@ int main(int argc, char *argv[]) {
 
 int mainMenu() {
 	
-	puts("Please enter a number below to select what you want to do:");
-	puts("1 - create new exam results file.");
-	puts("2 - view the exam results file.");
-	puts("3 - exit the program.");
+	if (RU) {
+		
+		puts("Введите нужный пункт меню:");
+		puts("1 - создать новый файл результатов экзамена.");
+		puts("2 - просмотреть файл результатов экзамена.");
+		puts("3 - выход.");
+		
+	}
+	else {
+		
+		puts("Please enter a number below to select what you want to do:");
+		puts("1 - create new exam results file.");
+		puts("2 - view the exam results file.");
+		puts("3 - exit the program.");
+		
+	}
 	
 	int result;
 	
@@ -71,7 +86,8 @@ int mainMenu() {
 			
 			/* new file */
 			
-			puts("Enter output file name:");
+			if (RU) puts("Введите название файла:");
+			else puts("Enter output file name:");
 			
 			char outputFileName[MAX_FNAME_LENGTH];
 			
@@ -83,7 +99,8 @@ int mainMenu() {
 			
 			if ((outputFile = fopen(outputFileName, "wb")) == NULL) {
 				
-				perror("An error occurred while trying to open the output file for writing");
+				if (RU) perror("Ошибка при открытии файла на чтение");
+				else perror("An error occurred while trying to open the output file for writing");
 				
 				return 1;
 				
@@ -95,7 +112,8 @@ int mainMenu() {
 			
 			system("CLS");
 			
-			puts("File successfully created.");
+			if (RU) puts("Файл успешно создан");
+			else puts("File successfully created.");
 			
 			break;
 			
@@ -103,7 +121,8 @@ int mainMenu() {
 			
 			/* view & edit file */
 			
-			puts("Enter file name:");
+			if (RU) puts("Введите имя файла:");
+			else puts("Enter file name:");
 	
 			char fileName[MAX_FNAME_LENGTH];
 			
@@ -123,7 +142,8 @@ int mainMenu() {
 			
 			system("CLS");
 			
-			puts("The number you entered doesn't correspond to any of the menu items. Please try again.");
+			if (RU) puts("Введённый вами номер не соответствует ни одному из пунктов меню. Попробуйте снова.");
+			else puts("The number you entered doesn't correspond to any of the menu items. Please try again.");
 			
 			return 1;
 		
@@ -141,7 +161,8 @@ int fileViewMenu(char *fileName) {
 				
 		system("CLS");
 
-		perror("FS error");
+		if (RU) perror("Ошибка файловой системы");
+		else perror("FS error");
 		
 		return 0;
 		
@@ -149,14 +170,30 @@ int fileViewMenu(char *fileName) {
 	
 	fclose(file);
 	
-	puts("Please enter a number below to select what you want to do:");
-	puts("1 - view file.");
-	puts("2 - add exam result.");
-	puts("3 - delete an exam result.");
-	puts("4 - edit an exam result.");
-	puts("5 - get the amount of 2-s for every discipline.");
-	puts("6 - get students, that have 2-s for at least 1 exam.");
-	puts("7 - return to the main menu.");
+	if (RU) {
+		
+		puts("Введите нужный пункт меню:");
+		puts("1 - просмотреть файл.");
+		puts("2 - добавить результат экзамена.");
+		puts("3 - удалить результат экзамена.");
+		puts("4 - отредактировать результат экзамена.");
+		puts("5 - посчитать количество двоек для каждой дисциплины.");
+		puts("6 - вывести студентов, у которых двойки хотя-бы по одному экзамену.");
+		puts("7 - вернуться в главное меню.");
+		
+	}
+	else {
+		
+		puts("Please enter a number below to select what you want to do:");
+		puts("1 - view file.");
+		puts("2 - add exam result.");
+		puts("3 - delete an exam result.");
+		puts("4 - edit an exam result.");
+		puts("5 - get the amount of 2-s for every discipline.");
+		puts("6 - get students, that have 2-s for at least 1 exam.");
+		puts("7 - return to the main menu.");
+		
+	}
 	
 	int result;
 	
@@ -179,7 +216,8 @@ int fileViewMenu(char *fileName) {
 			
 			if ((file = fopen(fileName, "ab")) == NULL) {
 		
-				perror("An error occurred while trying to open the file for writing");
+				if (RU) perror("Ошибка при открытии файла для записи");
+				else perror("An error occurred while trying to open the file for writing");
 				
 				return 1;
 				
@@ -201,7 +239,8 @@ int fileViewMenu(char *fileName) {
 			
 			fclose(file);
 			
-			puts("Exam result added.");
+			if (RU) puts("Результат экзамена добавлен.");
+			else puts("Exam result added.");
 			
 			break;
 			
@@ -238,7 +277,8 @@ int fileViewMenu(char *fileName) {
 			
 			system("CLS");
 			
-			puts("Invalid menu item selected, try again.");
+			if (RU) puts("Некорректный пункт меню выбран, попробуйте снова.");
+			else puts("Invalid menu item selected, try again.");
 			
 			break;
 		
@@ -250,27 +290,60 @@ int fileViewMenu(char *fileName) {
 
 void inputStudent(struct Student *student) {
 	
-	puts("Enter student last name:");
+	if (RU) puts("Введите фамилию студента:");
+	else puts("Enter student last name:");
 	
 	fgets(student->name, MAX_STUDENT_LAST_NAME_LENGTH, stdin);
 	student->name[strlen(student->name) - 1] = '\0';
 	
-	puts("Enter the mark for physics:");
-	while (!markValid(student->marks[0] = readMark())) puts("Invalid mark entered, try again:");
+	if (RU) puts("Введите оценку по физике:");
+	else puts("Enter the mark for physics:");
 	
-	puts("Enter the mark for math:");
-	while (!markValid(student->marks[1] = readMark())) puts("Invalid mark entered, try again:");
+	while (!markValid(student->marks[0] = readMark())) {
+		
+		if (RU) puts("Некорректная оценка введена, попробуйте снова:");
+		else puts("Invalid mark entered, try again:");
+		
+	}
 	
-	puts("Enter the mark for informatics:");
-	while (!markValid(student->marks[2] = readMark())) puts("Invalid mark entered, try again:");
+	if (RU) puts("Введите оценку по математике:");
+	else puts("Enter the mark for math:");
+	
+	while (!markValid(student->marks[1] = readMark())) {
+		
+		if (RU) puts("Некорректная оценка введена, попробуйте снова:");
+		else puts("Invalid mark entered, try again:");
+		
+	}
+	
+	if (RU) puts("Введите оценку по информатике:");
+	else puts("Enter the mark for informatics:");
+	
+	while (!markValid(student->marks[2] = readMark())) {
+		
+		if (RU) puts("Некорректная оценка введена, попробуйте снова:");
+		else puts("Invalid mark entered, try again:");
+		
+	}
 	
 }
 
 void tableTop() {
 	
-	puts("--------------------------------------");
-	puts("|  N|        Name        | P | M | I |");
-	puts("--------------------------------------");
+	if (RU) {
+		
+		puts("--------------------------------------");
+		puts("|  #|      Фамилия       | Ф | М | И |");
+		puts("--------------------------------------");
+		
+	}
+	else {
+		
+		puts("--------------------------------------");
+		puts("|  #|        Name        | P | M | I |");
+		puts("--------------------------------------");
+		
+	}
 	
 }
 
@@ -419,7 +492,8 @@ int menu_view(char *fileName) {
 				
 		system("CLS");
 
-		perror("An error occurred while trying to open the file for reading");
+		if (RU) perror("Ошибка при открытии файла не чтение");
+		else perror("An error occurred while trying to open the file for reading");
 		
 		return 1;
 		
@@ -440,7 +514,8 @@ int menu_view(char *fileName) {
 		
 		if (!readStudent(file, &student)) {
 			
-			puts("File empty, nothing to view.");
+			if (RU) puts("Файл пустой.");
+			else puts("File empty, nothing to view.");
 			
 			goto exitMark;
 			
@@ -476,10 +551,22 @@ int menu_view(char *fileName) {
 		
 		tableBottom();
 		
-		puts("Which direction do you want to scroll to?");
-		puts("1 - scroll up.");
-		puts("2 - scroll down.");
-		puts("3 - exit.");
+		if (RU) {
+			
+			puts("В каком направлении прокрутить список?");
+			puts("1 - вверх.");
+			puts("2 - вниз.");
+			puts("3 - выход.");
+			
+		}
+		else {
+			
+			puts("Which direction do you want to scroll to?");
+			puts("1 - scroll up.");
+			puts("2 - scroll down.");
+			puts("3 - exit.");
+			
+		}
 		
 		scanf("%d", &choise);
 		
@@ -535,7 +622,8 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 				
 		system("CLS");
 
-		perror("An error occurred while trying to open the file for reading");
+		if (RU) perror("Ошибка при открытии файла на чтение");
+		else perror("An error occurred while trying to open the file for reading");
 		
 		return 1;
 		
@@ -556,7 +644,8 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 		
 		if (!readStudent(file, &student)) {
 			
-			puts("File empty, nothing to view.");
+			if (RU) puts("Файл пустой.");
+			else puts("File empty, nothing to view.");
 			
 			break;
 			
@@ -598,10 +687,22 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 		
 		tableBottom();
 		
-		puts("Which direction do you want to scroll to?");
-		puts("1 - scroll up.");
-		puts("2 - scroll down.");
-		puts("3 - exit.");
+		if (RU) {
+			
+			puts("В каком направлении прокрутить список?");
+			puts("1 - вверх.");
+			puts("2 - вниз.");
+			puts("3 - выход.");
+			
+		}
+		else {
+			
+			puts("Which direction do you want to scroll to?");
+			puts("1 - scroll up.");
+			puts("2 - scroll down.");
+			puts("3 - exit.");
+			
+		}
 		
 		scanf("%d", &scroll);
 		
@@ -685,7 +786,8 @@ int menu_deleteExamResult(char *fileName) {
 	
 	if ((file = fopen(fileName, "r+b")) == NULL) {
 		
-		perror("An error occurred while trying to open the file for reading");
+		if (RU) perror("Ошибка при открытии файла для чтения");
+		else perror("An error occurred while trying to open the file for reading");
 		
 		return 1;
 		
@@ -693,7 +795,8 @@ int menu_deleteExamResult(char *fileName) {
 	
 	if ((tempFile = fopen("temp.bin", "wb")) == NULL) {
 		
-		perror("An error occurred while trying to open the file for reading");
+		if (RU) perror("Ошибка при открытии файла для чтения");
+		else perror("An error occurred while trying to open the file for reading");
 		
 		return 1;
 		
@@ -701,7 +804,8 @@ int menu_deleteExamResult(char *fileName) {
 	
 	/* fseek(file, 0, SEEK_CUR); */
 	
-	puts("Enter student last name:");
+	if (RU) puts("Введите фамилию студента");
+	else puts("Enter student last name:");
 	
 	char studentName[MAX_STUDENT_LAST_NAME_LENGTH];
 	fgets(studentName, MAX_STUDENT_LAST_NAME_LENGTH, stdin);
@@ -735,7 +839,8 @@ int menu_deleteExamResult(char *fileName) {
 			
 			tableStudent(n, &st);
 			
-			puts("Delete? (y/n)");
+			if (RU) puts("Удалить? (y/n)");
+			else puts("Delete? (y/n)");
 			
 			do {
 				
@@ -771,12 +876,14 @@ int menu_deleteExamResult(char *fileName) {
 	
 	if (n == 0) {
 		
-		puts("File empty.");
+		if (RU) puts("Файл пустой.");
+		else puts("File empty.");
 		
 	}
 	else if (found == 0) {
 		
-		puts("No matching students found.");
+		if (RU) puts("Не найдено студентов с такой фамилией.");
+		else puts("No matching students found.");
 		
 	}
 	
@@ -786,7 +893,7 @@ int menu_deleteExamResult(char *fileName) {
 	unlink(fileName);
 	rename("temp.bin", fileName);
 	
-	return 0;
+	return 1;
 	
 }
 
@@ -798,7 +905,8 @@ int menu_twosForEveryDiscipline(char *fileName) {
 				
 		system("CLS");
 
-		perror("(2) An error occurred while trying to open the file for reading");
+		if (RU) perror("Ошибка открытия файла на чтение.");
+		else perror("An error occurred while trying to open the file for reading");
 		
 		return 1;
 		
@@ -819,7 +927,8 @@ int menu_twosForEveryDiscipline(char *fileName) {
 			
 			if (!off) {
 				
-				puts("File empty, nothing to view.");
+				if (RU) puts("Файл пустой.");
+				else puts("File empty, nothing to view.");
 				
 			}
 			
@@ -841,9 +950,20 @@ int menu_twosForEveryDiscipline(char *fileName) {
 		
 	}
 	
-	printf("Two's for physics: %d\n", twos[0]);
-	printf("Two's for math: %d\n", twos[1]);
-	printf("Two's for informatics: %d\n", twos[2]);
+	if (RU) {
+		
+		printf("Двоек по физике: %d\n", twos[0]);
+		printf("Двоек по математике: %d\n", twos[1]);
+		printf("Двоек по информатике: %d\n", twos[2]);
+		
+	}
+	else {
+		
+		printf("Two's for physics: %d\n", twos[0]);
+		printf("Two's for math: %d\n", twos[1]);
+		printf("Two's for informatics: %d\n", twos[2]);
+		
+	}
 	
 	fclose(file);
 	
@@ -857,7 +977,8 @@ int menu_editExamResult(char *fileName) {
 	
 	if ((file = fopen(fileName, "r+b")) == NULL) {
 		
-		perror("An error occurred while trying to open the file for editing");
+		if (RU) perror("Ошибка открытия файла на редактирование");
+		else perror("An error occurred while trying to open the file for editing");
 		
 		return 1;
 		
@@ -865,7 +986,8 @@ int menu_editExamResult(char *fileName) {
 	
 	/* fseek(file, 0, SEEK_CUR); */
 	
-	puts("Enter student last name:");
+	if (RU) puts("Введите фамилию студента:");
+	else puts("Enter student last name:");
 	
 	char studentName[MAX_STUDENT_LAST_NAME_LENGTH];
 	fgets(studentName, MAX_STUDENT_LAST_NAME_LENGTH, stdin);
@@ -899,7 +1021,8 @@ int menu_editExamResult(char *fileName) {
 			
 			tableStudent(n, &st);
 			
-			puts("Edit? (y/n)");
+			if (RU) puts("Редактировать? (y/n)");
+			else puts("Edit? (y/n)");
 			
 			do {
 				
@@ -929,12 +1052,14 @@ int menu_editExamResult(char *fileName) {
 	
 	if (n == 0) {
 		
-		puts("File empty.");
+		if (RU) puts("Файл пустой.");
+		else puts("File empty.");
 		
 	}
 	else if (found == 0) {
 		
-		puts("No matching students found.");
+		if (RU) puts("Не найдено студентов с этой фамилией.");
+		else puts("No matching students found.");
 		
 	}
 	
