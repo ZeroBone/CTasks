@@ -16,19 +16,6 @@ struct Student {
 	char name[MAX_STUDENT_LAST_NAME_LENGTH];
 };
 
-typedef void (*RowCallback)(struct ZbTable*, unsigned long offset);
-typedef void (*PrintCallback)();
-
-struct ZbTable {
-	unsigned long rowsPerPage;
-	unsigned long currentOffset;
-	RowCallback rowCallback;
-	PrintCallback header;
-	PrintCallback footer;
-};
-
-/* ZbTable functions */
-/* end ZbTable functions */
 int mainMenu();
 char readMark();
 void inputStudent(struct Student *student);
@@ -62,21 +49,6 @@ int main(int argc, char *argv[]) {
 	system("pause");
 	
 	return 0;
-	
-}
-
-void zbt_init(struct ZbTable *table, unsigned long rowsPerPage,RowCallback rowCallback,
-	PrintCallback printHeader, PrintCallback printFooter) {
-	
-	table->currentOffset = 0;
-	
-	table->rowsPerPage = rowsPerPage;
-	
-	table->rowCallback = rowCallback;
-	
-	table->header = printHeader;
-	
-	table->footer = printFooter;
 	
 }
 
@@ -457,6 +429,7 @@ int menu_view(char *fileName) {
 	
 	long int offset = 0, i;
 	int choise;
+	char hasNextPage;
 	struct Student student;
 	
 	while (1) {
@@ -475,6 +448,8 @@ int menu_view(char *fileName) {
 		
 		tableTop();
 		
+		hasNextPage = 1;
+		
 		for (i = 0; i < ROWS_PER_PAGE; i++) {
 			
 			fseek(file, (offset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
@@ -482,6 +457,8 @@ int menu_view(char *fileName) {
 			if (!readStudent(file, &student)) {
 				
 				fseek(file, (offset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+				
+				hasNextPage = 0;
 			
 				break;
 				
@@ -516,20 +493,20 @@ int menu_view(char *fileName) {
 				offset -= ROWS_PER_PAGE;
 				if (offset < 0) offset = 0;
 				
-				system("CLS");
-				
 				break;
 				
 			case 2:
 				/* scroll down */
+				
+				if (!hasNextPage) break;
+				
+				fseek(file, (offset + ROWS_PER_PAGE) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 				
 				if (readStudent(file, &student)) {
 					
 					offset += ROWS_PER_PAGE;
 					
 				}
-				
-				system("CLS");
 				
 				break;
 			
@@ -566,9 +543,10 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 	
 	fseek(file, 0, SEEK_SET);
 	
-	long int offset = 0, i;
+	long int offset = 0, i, currentOffset;
 	int scroll;
 	struct Student student;
+	char hasNextPage;
 	
 	while (1) {
 		
@@ -588,13 +566,19 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 		
 		i = 0;
 		
+		currentOffset = offset;
+		
+		hasNextPage = 1;
+		
 		while (i < ROWS_PER_PAGE) {
 			
-			fseek(file, (offset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+			fseek(file, (currentOffset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 			
 			if (!readStudent(file, &student)) {
 				
-				fseek(file, 0, SEEK_SET);
+				fseek(file, (currentOffset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+				
+				hasNextPage = 0;
 			
 				break;
 				
@@ -602,11 +586,13 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 			
 			if (student.marks[0] == MARK_TWO || student.marks[1] == MARK_TWO || student.marks[2] == MARK_TWO) {
 				
-				tableStudent(i + offset, &student);
+				tableStudent(i + currentOffset, &student);
+				
+				i++;
 				
 			}
 			
-			i++;
+			currentOffset++;
 			
 		}
 		
@@ -626,8 +612,37 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 			case 1:
 				/* scroll up */
 				
-				offset -= ROWS_PER_PAGE;
-				if (offset < 0) offset = 0;
+				/*offset -= ROWS_PER_PAGE;
+				if (offset < 0) offset = 0;*/
+				i = 0;
+				
+				while (i < ROWS_PER_PAGE && offset) {
+			
+					fseek(file, (offset) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+					
+					if (!readStudent(file, &student)) {
+						
+						/* this cannot happen, we already read this data */
+						
+						fseek(file, offset * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+						
+						hasNextPage = 0;
+					
+						break;
+						
+					}
+					
+					if (student.marks[0] == MARK_TWO || student.marks[1] == MARK_TWO || student.marks[2] == MARK_TWO) {
+						
+						tableStudent(offset, &student);
+						
+						i++;
+						
+					}
+					
+					offset--;
+					
+				}
 				
 				system("CLS");
 				
@@ -636,9 +651,9 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 			case 2:
 				/* scroll down */
 				
-				if (readStudent(file, &student)) {
+				if (hasNextPage && readStudent(file, &student)) {
 			
-					offset += ROWS_PER_PAGE;
+					offset = currentOffset;
 					
 				}
 				
@@ -659,7 +674,7 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 		
 	fclose(file);
 	
-	return 0;
+	return 1;
 	
 }
 
