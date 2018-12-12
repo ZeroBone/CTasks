@@ -9,12 +9,26 @@
 #define MARK_MIN 2
 #define MARK_MAX 5
 #define MARK_TWO 2
+#define ROWS_PER_PAGE 5
 
 struct Student {
 	char marks[3];
 	char name[MAX_STUDENT_LAST_NAME_LENGTH];
 };
 
+typedef void (*RowCallback)(struct ZbTable*, unsigned long offset);
+typedef void (*PrintCallback)();
+
+struct ZbTable {
+	unsigned long rowsPerPage;
+	unsigned long currentOffset;
+	RowCallback rowCallback;
+	PrintCallback header;
+	PrintCallback footer;
+};
+
+/* ZbTable functions */
+/* end ZbTable functions */
 int mainMenu();
 char readMark();
 void inputStudent(struct Student *student);
@@ -48,6 +62,21 @@ int main(int argc, char *argv[]) {
 	system("pause");
 	
 	return 0;
+	
+}
+
+void zbt_init(struct ZbTable *table, unsigned long rowsPerPage,RowCallback rowCallback,
+	PrintCallback printHeader, PrintCallback printFooter) {
+	
+	table->currentOffset = 0;
+	
+	table->rowsPerPage = rowsPerPage;
+	
+	table->rowCallback = rowCallback;
+	
+	table->header = printHeader;
+	
+	table->footer = printFooter;
 	
 }
 
@@ -315,7 +344,7 @@ void writeStudent(FILE *file, struct Student *student) {
 	
 	int written = 3 + fwriteString(file, student->name);
 	
-	printf("Written: %d\n", written);
+	/* printf("Written: %d\n", written); */
 	
 	for (;written < STUDENT_COMPONENT_LENGTH; written++) {
 		
@@ -426,9 +455,9 @@ int menu_view(char *fileName) {
 	
 	fseek(file, 0, SEEK_SET);
 	
-	long int offset = 0, i, studentsPerPage = 5;
+	long int offset = 0, i;
 	int choise;
-	struct Student stud;
+	struct Student student;
 	
 	while (1) {
 		
@@ -436,18 +465,9 @@ int menu_view(char *fileName) {
 		
 		fseek(file, offset * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 		
-		if (!readStudent(file, &stud)) {
+		if (!readStudent(file, &student)) {
 			
-			if (!offset) {
-				
-				puts("File empty, nothing to view.");
-				
-			}
-			else {
-				
-				puts("Nothing to view.");
-				
-			}
+			puts("File empty, nothing to view.");
 			
 			goto exitMark;
 			
@@ -455,13 +475,13 @@ int menu_view(char *fileName) {
 		
 		tableTop();
 		
-		for (i = 0; i < studentsPerPage; i++) {
+		for (i = 0; i < ROWS_PER_PAGE; i++) {
 			
 			fseek(file, (offset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 			
-			if (!readStudent(file, &stud)) {
+			if (!readStudent(file, &student)) {
 				
-				fseek(file, 0, SEEK_SET);
+				fseek(file, (offset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 			
 				break;
 				
@@ -473,7 +493,7 @@ int menu_view(char *fileName) {
 			printf("Math mark: %d\n", stud->marks[1]);
 			printf("Informatics mark: %d\n", stud->marks[2]);*/
 			
-			tableStudent(i + offset, &stud);
+			tableStudent(i + offset, &student);
 			
 		}
 		
@@ -493,7 +513,7 @@ int menu_view(char *fileName) {
 			case 1:
 				/* scroll up */
 				
-				offset -= studentsPerPage;
+				offset -= ROWS_PER_PAGE;
 				if (offset < 0) offset = 0;
 				
 				system("CLS");
@@ -502,7 +522,12 @@ int menu_view(char *fileName) {
 				
 			case 2:
 				/* scroll down */
-				offset += studentsPerPage;
+				
+				if (readStudent(file, &student)) {
+					
+					offset += ROWS_PER_PAGE;
+					
+				}
 				
 				system("CLS");
 				
@@ -541,37 +566,33 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 	
 	fseek(file, 0, SEEK_SET);
 	
-	long int soffset = 0, j, stPerPage = 5;
+	long int offset = 0, i;
 	int scroll;
-	struct Student stu_;
+	struct Student student;
 	
 	while (1) {
 		
 		system("CLS");
 		
-		fseek(file, soffset * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+		fseek(file, offset * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 		
-		if (!readStudent(file, &stu_)) {
+		if (!readStudent(file, &student)) {
 			
-			if (!soffset) {
-				
-				puts("File empty, nothing to view.");
-				
-			}
+			puts("File empty, nothing to view.");
 			
-			goto exitM;
+			break;
 			
 		}
 		
 		tableTop();
 		
-		j = 0;
+		i = 0;
 		
-		while (j < stPerPage) {
+		while (i < ROWS_PER_PAGE) {
 			
-			fseek(file, (soffset + j) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
+			fseek(file, (offset + i) * STUDENT_COMPONENT_LENGTH, SEEK_SET);
 			
-			if (!readStudent(file, &stu_)) {
+			if (!readStudent(file, &student)) {
 				
 				fseek(file, 0, SEEK_SET);
 			
@@ -579,13 +600,13 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 				
 			}
 			
-			if (stu_.marks[0] == MARK_TWO || stu_.marks[1] == MARK_TWO || stu_.marks[2] == MARK_TWO) {
+			if (student.marks[0] == MARK_TWO || student.marks[1] == MARK_TWO || student.marks[2] == MARK_TWO) {
 				
-				tableStudent(j + soffset, &stu_);
+				tableStudent(i + offset, &student);
 				
 			}
 			
-			j++;
+			i++;
 			
 		}
 		
@@ -605,8 +626,8 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 			case 1:
 				/* scroll up */
 				
-				soffset -= stPerPage;
-				if (soffset < 0) soffset = 0;
+				offset -= ROWS_PER_PAGE;
+				if (offset < 0) offset = 0;
 				
 				system("CLS");
 				
@@ -614,7 +635,12 @@ int menu_twosForAtLeast1Exam(char *fileName) {
 				
 			case 2:
 				/* scroll down */
-				soffset += stPerPage;
+				
+				if (readStudent(file, &student)) {
+			
+					offset += ROWS_PER_PAGE;
+					
+				}
 				
 				system("CLS");
 				
@@ -846,7 +872,7 @@ int menu_editExamResult(char *fileName) {
 			
 		}
 		
-		printf("Comp: Read: %s Searching: %s\n", st.name, studentName);
+		/* printf("Comp: Read: %s Searching: %s\n", st.name, studentName); */
 		
 		if (!strcmp(st.name, studentName)) {
 			
