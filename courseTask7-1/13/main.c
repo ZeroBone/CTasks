@@ -5,6 +5,10 @@
 #include <windows.h>
 #define MAX_FNAME_LENGTH 50
 
+/*
+
+*/
+
 void fprintFragment(FILE *file, int count);
 char isEndOfWord(int c);
 char isEndOfPhrase(int c);

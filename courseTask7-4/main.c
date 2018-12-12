@@ -914,6 +914,8 @@ int menu_twosForEveryDiscipline(char *fileName) {
 	
 	fseek(file, 0, SEEK_SET);
 	
+	system("CLS");
+	
 	long int twos[] = {0, 0, 0};
 	long int off = 0;
 	int k;
