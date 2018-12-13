@@ -153,13 +153,41 @@ int main(int argc, char *argv[]) {
 			temp = current;
 			current = fgetc(file);
 			
+			if (isEndOfPhrase(current)) {
+				
+				phraseEnded = 1;
+				
+				continue;
+				
+			}
+			
 			/* printf("SEQUENCE %c%c DIGITS: %d %d\n", temp, current, temp, current); */
 			
 			if (temp == '-' && current == 233) { /* 233 is the code of the russian letter */
+			
+				current = fgetc(file);
 				
-				hasNumbers = 1;
+				if (isEndOfWord(current)) {
 				
-				continue;
+					hasNumbers = 1;
+					
+					/*wordBegan = 1;*/
+					
+					continue;
+					
+				}
+				
+				if (isEndOfPhrase(current)) {
+					
+					hasNumbers = 1;
+					
+					/*wordBegan = 1;*/
+				
+					phraseEnded = 1;
+					
+					continue;
+					
+				}
 				
 			}
 			
