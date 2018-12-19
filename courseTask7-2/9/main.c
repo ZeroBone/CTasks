@@ -16,6 +16,7 @@ int main() {
 	SetConsoleOutputCP(1251);
 	
 	char inputFileName[MAX_FNAME_LENGTH];
+	char doubleContainer[50];
 	
 	FILE *inputFile, *outputFile;
 	
@@ -49,44 +50,79 @@ int main() {
 	
 	/* file streams opened */
 	
+	
+	int maxRowWidth = 0, rowWidth;
 	double matrixElement;
-	double sum = 0;
-	double minRowElement = DBL_MAX, maxRowElement = DBL_MIN;
 	
 	while (fscanf(inputFile, "%lf", &matrixElement) != EOF) {
 		
-		printf("Current matrix element: %lf\n", matrixElement);
+		sprintf(doubleContainer, "%.2f", matrixElement);
+			
+		rowWidth = strlen(doubleContainer);
 		
-		sum += matrixElement;
+		if (rowWidth > maxRowWidth) {
+			
+			maxRowWidth = rowWidth;
+			
+		}
+					
+		printf("Length: %d\n", rowWidth);
 		
-		if (matrixElement > maxRowElement) {
-			maxRowElement = matrixElement;
+	}
+	
+	fseek(inputFile, 0, SEEK_SET);
+	
+	double sum = 0;
+	double minRowElement = DBL_MAX, maxRowElement = DBL_MIN;
+	int current;
+	
+	while (1) {
+		
+		current = fscanf(inputFile, "%lf", &matrixElement);
+		
+		if (current != EOF) {
+			
+			printf("Current matrix element: %.2f\n", matrixElement);
+			
+			sum += matrixElement;
+		
+			if (matrixElement > maxRowElement) {
+				maxRowElement = matrixElement;
+			}
+			
+			if (matrixElement < minRowElement) {
+				minRowElement = matrixElement;
+			}
+			
+			/*fprintf(outputFile, "%.2f", matrixElement);*/
+			writeDoubleAligned(outputFile, doubleContainer, matrixElement, maxRowWidth);
+			
 		}
 		
-		if (matrixElement < minRowElement) {
-			minRowElement = matrixElement;
-		}
-		
-		fprintf(outputFile, "%.2lf", matrixElement);
-		
-		if (fgetc(inputFile) == '\n') {
+		if (current == EOF || fgetc(inputFile) == '\n') {
 			
 			puts("End of line");
 			
 			/* it is also good to check that minRowElement and maxRowElement are not DBL_MIN/DBL_MAX */
 			
-			fprintf(outputFile, " %.2f ", sum);
-			fprintf(outputFile, "%.2f ", minRowElement);
-			fprintf(outputFile, "%.2f", maxRowElement);
+			/*fputc(' ', outputFile);*/
 			
-			fputc('\n', outputFile);
+			writeDoubleAligned(outputFile, doubleContainer, sum, maxRowWidth);
+			writeDoubleAligned(outputFile, doubleContainer, minRowElement, maxRowWidth);
+			writeDoubleAligned(outputFile, doubleContainer, maxRowElement, maxRowWidth);
+			
+			/*fprintf(outputFile, " %.2f ", sum);
+			fprintf(outputFile, "%.2f ", minRowElement);
+			fprintf(outputFile, "%.2f", maxRowElement);*/
 			
 			sum = 0;
 			minRowElement = DBL_MAX;
 			maxRowElement = DBL_MIN;
 			
+			if (current == EOF) break;
+			else fputc('\n', outputFile);
+			
 		}
-		else fputc(' ', outputFile);
 		
 	}
 	
@@ -99,3 +135,17 @@ int main() {
 	
 }
 
+void writeDoubleAligned(FILE *file, char *container, double value, int maxWidth) {
+	
+	int width = sprintf(container, "%.2f", value);
+	
+	int i;	
+	for (i = maxWidth + 1 - width; i > 0; i--) {
+		
+		fputc(' ', file);
+		
+	}
+	
+	fputs(container, file);
+	
+}
