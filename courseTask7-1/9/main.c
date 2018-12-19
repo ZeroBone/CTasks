@@ -7,7 +7,6 @@
 
 char isEndOfPhrase(int c);
 char isVowel(char c);
-int fOk(FILE* file, char *vowels);
 
 const char *allVowels = "aeiouAEIOUàåèîóşÿÀÅÈÎÓŞß";
 
@@ -58,7 +57,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	int current, temp, phraseStart = 0, currentPosition;
-	char wordBegan = 1, phraseEnded = 0;
+	char phraseEnded = 0;
 	int vowels = 0;
 	char vstring[50] = "";
 	char currentVowelStr[] = "?";
@@ -97,7 +96,6 @@ int main(int argc, char *argv[]) {
 			phraseEnded = 0;
 			vowels = 0;
 			phraseStart = currentPosition;
-			wordBegan = 1;
 			vstring[0] = '\0';
 			
 		}
