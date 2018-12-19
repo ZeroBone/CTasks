@@ -71,21 +71,25 @@ int main(int argc, char *argv[]) {
 			fseek(file, phraseStart, SEEK_SET);
 			printf("Found %d:\n", vowels);
 			
-			do {
+			if (vowels >= 4) {
+				
+				do {
 			
-				temp = fgetc(file);
+					temp = fgetc(file);
+					
+					if (temp != EOF) {
+						
+						fputc(temp, tempFile);
+						
+						/* putc(temp, stdout); */
+						
+					}
+					
+				} while (temp != EOF && ftell(file) < currentPosition);
 				
-				if (temp != EOF) {
-					
-					if (vowels >= 4) fputc(temp, tempFile);
-					
-					putc(temp, stdout);
-					
-				}
-				
-			} while (temp != EOF && ftell(file) < currentPosition);
+			}
 			/*fputc('|', tempFile);*/
-			printf("\n");
+			/*printf("\n");*/
 			
 			fseek(file, currentPosition, SEEK_SET);
 			
